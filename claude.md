@@ -120,8 +120,10 @@ Update this checklist at the end of each phase.
 - **Versions:** Next.js 16.2.3 (pinned to match the inventory), React 19.2.4, Tailwind v4, pnpm 11, Node 22.
 - **pnpm 11** uses `allowBuilds:` in `pnpm-workspace.yaml` (not `ignoredBuiltDependencies`).
 - **Toasts:** always `import { notify } from "@/lib/toast"`. One `<Toaster />` lives in each root layout. Don't import `sonner` directly in pages.
-- **Login placeholders (Phase 3 replaces them):** shop `Navbar.jsx` has `isAuthenticated = false`; admin `login-form.jsx` and `nav-user.jsx` fake the login/logout; `apps/admin/src/app/dashboard/layout.js` needs the JWT guard.
-- **Left in the inventory for later:** shop `form.jsx` + `text-animate.jsx` (Phase 4), admin `media-uploader.jsx` (Cloudinary, Phase 4), admin `product-table.jsx` (Phase 4).
+- **Login placeholders (Phase 3 replaces them):** shop `Navbar.jsx` has `isAuthenticated = false`; shop `components/forms/login-form.jsx` uses a `previewAuth` stub; admin `login-form.jsx` and `nav-user.jsx` fake the login/logout; `apps/admin/src/app/dashboard/layout.js` needs the JWT guard.
+- **Copy the inventory faithfully.** Shop Navbar, Banner, Footer layout and login page are the originals (Navbar floats over the Hero, Banner stays pinned). Don't "improve" layouts without asking Yussuf first.
+- **Unbuilt pages** show a branded "coming soon" page: shop `app/not-found.js`, admin `app/dashboard/[...slug]/page.jsx`. Delete an entry from `comingIn` when its page is built.
+- **Left in the inventory for later:** shop `text-animate.jsx`, home sections (Collection, models, services, shortcuts), admin `media-uploader.jsx` (Cloudinary) and `product-table.jsx` (all Phase 4).
 - **Footer contact details** are placeholders (`href="#"`). Yussuf to supply the real ones.
 - **Python is not installed yet** (only the Microsoft Store alias). Install Python 3.12 before Phase 6.
 - Brand photos live in `apps/shop/public/assets/images/*.webp` (converted from the inventory PNGs).

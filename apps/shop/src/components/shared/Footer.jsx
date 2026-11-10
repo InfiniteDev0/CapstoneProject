@@ -127,7 +127,13 @@ export default function Footer() {
       <div className="mx-auto flex max-w-7xl flex-col items-center justify-between border-t border-gray-200 px-4 py-4 text-xs md:flex-row">
         <div className="flex items-center gap-2">
           <span>Ship to:</span>
-          <span aria-hidden="true">🇦🇪</span>
+          {/* UAE flag drawn in SVG (Windows does not show flag emojis) */}
+          <svg viewBox="0 0 12 6" className="inline-block h-3.5 w-7 border border-black/10" role="img" aria-label="UAE flag">
+            <rect width="12" height="2" fill="#00732f" />
+            <rect y="2" width="12" height="2" fill="#ffffff" />
+            <rect y="4" width="12" height="2" fill="#000000" />
+            <rect width="3" height="6" fill="#ff0000" />
+          </svg>
           <a href="#" className="underline">United Arab Emirates</a>
         </div>
         <div className="mt-2 flex items-center gap-4 md:mt-0">

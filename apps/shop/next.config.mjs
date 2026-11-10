@@ -1,6 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  /* config options here */
+  // Keep the dev "N" bubble away from the scroll-to-top arrow (bottom-left)
+  devIndicators: { position: "bottom-right" },
 };
 
 export default nextConfig;

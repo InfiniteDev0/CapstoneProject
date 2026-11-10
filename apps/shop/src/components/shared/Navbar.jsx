@@ -1,92 +1,110 @@
 "use client";
-
 import Image from "next/image";
-import Link from "next/link";
-import { useState } from "react";
-import { AnimatePresence, motion } from "motion/react";
+import logo from "../../../public/logo.png";
 import {
-  Gem,
-  Gift,
   HandbagIcon,
   Heart,
-  Layers,
-  PartyPopper,
-  Sparkles,
-  Tag,
   User2,
+  UserRoundCheck,
+  Sparkles,
+  Layers,
+  Gem,
   Watch,
+  Tag,
   Wine,
+  Gift,
+  PartyPopper,
 } from "lucide-react";
+import Link from "next/link";
+import { useState } from "react";
+import { motion, AnimatePresence } from "motion/react";
 
-const menuItems = [
-  { label: "New & featured", path: "/new", icon: Sparkles },
-  { label: "Our Collections", path: "/collections", icon: Layers },
-  { label: "Rare Collectibles", path: "/collections/rare-collectibles", icon: Gem },
-  { label: "Accessories", path: "/accessories", icon: Watch },
-  { label: "Sales and Deals", path: "/sale", icon: Tag },
-  { label: "VN Saloon", path: "/discover", icon: Wine },
-  { label: "Gifts and personalization", path: "/gifts", icon: Gift },
-  { label: "The VN Gala", path: "/gala", icon: PartyPopper },
-];
 
 export default function Navbar() {
-  const [menuOpen, setMenuOpen] = useState(false);
+  const [MenuState, setMenuState] = useState(false);
   // Phase 3 wires this to the Java JWT login. Until then everyone is a guest.
   const isAuthenticated = false;
+  const loading = false;
+
+  const menuItems = [
+    { label: "New & featured", path: "/new", icon: Sparkles },
+    { label: "Our Collections", path: "/men", icon: Layers },
+    { label: "Rare Collectibles", path: "/women", icon: Gem },
+    { label: "Accessories", path: "/collections", icon: Watch },
+    { label: "Sales and Deal", path: "/sale", icon: Tag },
+    { label: "VN Saloon", path: "/discover", icon: Wine },
+    { label: "Gifts and personalization", path: "/gifts", icon: Gift },
+    { label: "The VN Gala", path: "/gala", icon: PartyPopper },
+  ];
 
   return (
-    <div className="sticky top-0 z-50 w-full">
-      <nav className="grid h-fit w-full grid-cols-3 items-center bg-white/95 px-5 py-2 text-blue-950 backdrop-blur-3xl">
-        <button
-          type="button"
-          onClick={() => setMenuOpen((open) => !open)}
-          aria-expanded={menuOpen}
-          className="w-fit cursor-pointer px-2 py-2 text-left text-black"
+    <div className="fixed funnel   w-full z-50">
+      {/* Desktop Navbar */}
+      <nav className="grid grid-cols-3  fixed w-full z-50 bg-white backdrop-blur-3xl items-center justify-between h-fit !py-2 !px-5 text-blue-950 transition-all duration-400">
+        {/* menu button manager */}
+        <div
+          onClick={() => setMenuState(!MenuState)}
+          className="w-fit h-fit px-2 py-2 flex flex-col cursor-pointer"
         >
-          {menuOpen ? "Close" : "Menu"}
-        </button>
+          {!MenuState ? (
+            <p className=" text-black">Menu</p>
+          ) : (
+            <p className=" text-black">Close</p>
+          )}
+        </div>
 
         <div className="flex items-center justify-center">
-          <Link href="/" aria-label="Vela Noire home">
-            <Image src="/logo.png" alt="Vela Noire" width={160} height={60} priority className="w-40" />
+          <Link href={"/"}>
+            <Image src={logo} className="w-40" alt="Brand logo" />
           </Link>
         </div>
 
-        <div className="flex items-center justify-end gap-5">
-          <Link href="/help" className="hidden text-xs font-semibold tracking-wide underline sm:block">
+        <div className="flex items-center gap-5 justify-end">
+          <p className="text-xs underline font-semibold tracking-wide">
             Help now?
+          </p>
+          <Link href={"/"}>
+            <Heart className="w-4 h-4" />
           </Link>
-          <Link href="/wishlist" aria-label="Wishlist">
-            <Heart className="size-4" />
-          </Link>
-          <Link href={isAuthenticated ? "/account" : "/login"} aria-label="Account">
-            <User2 className="size-4" />
-          </Link>
-          <Link href="/cart" aria-label="Shopping bag">
-            <HandbagIcon className="size-4" />
+
+          {/* User icon — switches based on auth state */}
+          {!loading && (
+            <Link href={isAuthenticated ? "/MyVn" : "/login"}>
+              {isAuthenticated ? (
+                <UserRoundCheck className="w-4 h-4" />
+              ) : (
+                <User2 className="w-4 h-4" />
+              )}
+            </Link>
+          )}
+
+          <Link href={"/"}>
+            <HandbagIcon className="w-4 h-4" />
           </Link>
         </div>
       </nav>
 
+      {/* menu dropdown with Framer Motion */}
       <AnimatePresence>
-        {menuOpen && (
+        {MenuState && (
           <motion.div
-            initial={{ x: -100, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            exit={{ x: -100, opacity: 0 }}
+            initial={{ x: -100, opacity: 0 }} // Start off-screen to the left
+            animate={{ x: 0, opacity: 1 }} // Slide into view
+            exit={{ x: -100, opacity: 0 }} // Slide back to the left on close
             transition={{ type: "spring", damping: 25, stiffness: 200 }}
-            className="absolute left-1 top-full mt-1 h-fit w-auto max-w-xs rounded-md bg-white px-3 py-5 shadow-lg"
+            className="relative top-15 left-1 w-auto max-w-xs h-fit !py-5 !px-3 rounded-md z-50 bg-white backdrop-blur-3xl"
           >
             <ul className="flex flex-col gap-2">
               {menuItems.map(({ label, path, icon: Icon }) => (
-                <li key={path} className="group relative list-none">
+                <li key={path} className="relative group list-none">
                   <Link
                     href={path}
-                    onClick={() => setMenuOpen(false)}
-                    className="flex items-center justify-between rounded-md bg-zinc-100 px-2 py-2 text-sm tracking-wider transition-all duration-300 hover:bg-black hover:text-white"
+                    onClick={() => setMenuState(false)} // Close menu on click
+                    className="block !px-2 rounded-md transition-all duration-300 flex items-center justify-between !py-2 text-sm  tracking-wider
+                    bg-zinc-100 hover:bg-black hover:text-white"
                   >
                     {label}
-                    <Icon className="size-4 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+                    <Icon className="size-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                   </Link>
                 </li>
               ))}
