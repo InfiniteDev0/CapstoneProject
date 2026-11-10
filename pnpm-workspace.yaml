@@ -1,0 +1,8 @@
+packages:
+  - apps/shop
+  - apps/admin
+
+# sharp and unrs-resolver ship prebuilt binaries, so their install scripts are not needed
+allowBuilds:
+  sharp: false
+  unrs-resolver: false

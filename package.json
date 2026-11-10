@@ -1,0 +1,11 @@
+{
+  "name": "vela-noire-capstone",
+  "private": true,
+  "description": "Vela Noire: E-Commerce Intelligent Analytics & Personalization Suite",
+  "scripts": {
+    "dev:shop": "pnpm --filter shop dev",
+    "dev:admin": "pnpm --filter admin dev",
+    "build:shop": "pnpm --filter shop build",
+    "build:admin": "pnpm --filter admin build"
+  }
+}

@@ -1,0 +1,24 @@
+# JavaScript
+node_modules/
+.next/
+out/
+*.tsbuildinfo
+next-env.d.ts
+
+# Secrets
+.env
+.env.*
+!.env.example
+
+# Java
+target/
+
+# Python
+__pycache__/
+.venv/
+*.pkl
+
+# OS / editor
+.DS_Store
+Thumbs.db
+*.log
