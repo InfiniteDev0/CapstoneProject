@@ -105,8 +105,8 @@ CapstoneProject/
 | 8 | **Opening night** | Test the demo, export databases, report + diagrams, submit | all |
 
 ## Current status
-- [ ] Phase 1 — The building  ← **we are here**
-- [ ] Phase 2 — The storage
+- [x] Phase 1 — The building (done 2026-11-10)
+- [ ] Phase 2 — The storage  ← **we are here**
 - [ ] Phase 3 — The kitchen
 - [ ] Phase 4 — The wiring
 - [ ] Phase 5 — Practice guests
@@ -115,6 +115,16 @@ CapstoneProject/
 - [ ] Phase 8 — Opening night
 
 Update this checklist at the end of each phase.
+
+## Build notes (things later phases need to know)
+- **Versions:** Next.js 16.2.3 (pinned to match the inventory), React 19.2.4, Tailwind v4, pnpm 11, Node 22.
+- **pnpm 11** uses `allowBuilds:` in `pnpm-workspace.yaml` (not `ignoredBuiltDependencies`).
+- **Toasts:** always `import { notify } from "@/lib/toast"`. One `<Toaster />` lives in each root layout. Don't import `sonner` directly in pages.
+- **Login placeholders (Phase 3 replaces them):** shop `Navbar.jsx` has `isAuthenticated = false`; admin `login-form.jsx` and `nav-user.jsx` fake the login/logout; `apps/admin/src/app/dashboard/layout.js` needs the JWT guard.
+- **Left in the inventory for later:** shop `form.jsx` + `text-animate.jsx` (Phase 4), admin `media-uploader.jsx` (Cloudinary, Phase 4), admin `product-table.jsx` (Phase 4).
+- **Footer contact details** are placeholders (`href="#"`). Yussuf to supply the real ones.
+- **Python is not installed yet** (only the Microsoft Store alias). Install Python 3.12 before Phase 6.
+- Brand photos live in `apps/shop/public/assets/images/*.webp` (converted from the inventory PNGs).
 
 ## Rules
 - Never commit `.env` files, secrets, `node_modules`, `.next`, `target/`, `.venv` or large data files.
