@@ -7,18 +7,22 @@ import Link from "next/link";
  *  Desktop → 50/50 split: form on the left, brand photograph on the right.
  *  Phones  → the form only, full screen.
  *
+ * Always dark: the `dark` class switches this page to the theme's dark palette
+ * (see `.dark` in globals.css), so the shadcn inputs and buttons follow along.
+ *
  * The page is pinned to the screen. If the form grows taller than the screen
  * (the register form has more fields), the form column scrolls, not the page.
  */
 export default function AuthShell({ children }) {
   return (
-    <div className="h-svh overflow-hidden bg-white lg:grid lg:grid-cols-2 lg:gap-2 lg:p-2">
-      {/* ── Left: logo + form ─────────────────────────────── */}
+    <div className="dark h-svh overflow-hidden bg-background text-foreground [color-scheme:dark] lg:grid lg:grid-cols-2 lg:gap-2 lg:p-2">
+      {/* ── Left: form ────────────────────────────────────── */}
       <section className="flex h-full flex-col gap-4 p-6 lg:p-10">
-        <header className="shrink-0">
+        {/* Phones only: the photo (and its logo) is hidden, so show the logo here */}
+        <header className="shrink-0 lg:hidden">
           <Link href="/" aria-label="Vela Noire home" className="block w-fit">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/logo.png" className="w-30" alt="Vela Noire" />
+            <img src="/logo.png" className="w-30 invert" alt="Vela Noire" />
           </Link>
         </header>
 
@@ -33,7 +37,7 @@ export default function AuthShell({ children }) {
       </section>
 
       {/* ── Right: photograph (desktop only) ──────────────── */}
-      <section aria-hidden="true" className="relative hidden overflow-hidden rounded-lg bg-black lg:block">
+      <section className="relative hidden overflow-hidden rounded-lg bg-black lg:block">
         <Image
           src="/auth.jpg"
           alt=""
@@ -42,8 +46,15 @@ export default function AuthShell({ children }) {
           sizes="50vw"
           className="object-cover object-[center_30%]"
         />
-        <div className="absolute inset-0 bg-linear-to-t from-black/70 via-transparent to-transparent" />
-        <div className="absolute inset-x-8 bottom-8 text-white">
+        {/* Darken the top and bottom edges so the white logo and text stay readable */}
+        <div className="absolute inset-0 bg-linear-to-t from-black/70 via-transparent to-black/30" />
+
+        <Link href="/" aria-label="Vela Noire home" className="absolute right-8 top-8">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/logo.png" className="w-36 invert" alt="Vela Noire" />
+        </Link>
+
+        <div className="absolute inset-x-8 bottom-8 text-right text-white">
           <p className="text-6xl font-light tracking-tight xl:text-8xl">Vela Noire</p>
           <p className="mt-2 text-base text-white/80">Luxury Reimagined for Her</p>
         </div>
