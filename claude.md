@@ -118,6 +118,8 @@ Update this checklist at the end of each phase.
 
 ## Build notes (things later phases need to know)
 - **Versions:** Next.js 16.2.3 (pinned to match the inventory), React 19.2.4, Tailwind v4, pnpm 11, Node 22.
+- **Fonts are local** (`@fontsource-variable/outfit`, `@fontsource/birthstone`, `@fontsource-variable/geist-mono`), imported in each root layout. Don't use `next/font/google`: Turbopack dev crashes on it here ("next/font/google queries have exactly one entry").
+- **If a new page looks unstyled in dev**, restart `pnpm dev` (OneDrive can hide new files from Tailwind's watcher).
 - **pnpm 11** uses `allowBuilds:` in `pnpm-workspace.yaml` (not `ignoredBuiltDependencies`).
 - **Toasts:** always `import { notify } from "@/lib/toast"`. One `<Toaster />` lives in each root layout. Don't import `sonner` directly in pages.
 - **Login placeholders (Phase 3 replaces them):** shop `Navbar.jsx` has `isAuthenticated = false`; shop `components/forms/login-form.jsx` uses a `previewAuth` stub; admin `login-form.jsx` and `nav-user.jsx` fake the login/logout; `apps/admin/src/app/dashboard/layout.js` needs the JWT guard.

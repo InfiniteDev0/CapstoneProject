@@ -63,6 +63,8 @@ textarea {
 }
 
 :root {
+  --font-outfit: "Outfit Variable", sans-serif;
+  --font-birthstone: "Birthstone", cursive;
   --radius: 0.625rem;
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);

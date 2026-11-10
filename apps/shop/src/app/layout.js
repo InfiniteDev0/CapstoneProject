@@ -1,19 +1,9 @@
-import { Birthstone, Outfit } from "next/font/google";
+// Fonts are stored locally (no Google download at startup, works offline for the demo)
+import "@fontsource-variable/outfit";
+import "@fontsource/birthstone";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 import SiteChrome from "@/components/shared/SiteChrome";
-
-const outfit = Outfit({
-  variable: "--font-outfit",
-  subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"],
-});
-
-const birthstone = Birthstone({
-  variable: "--font-birthstone",
-  subsets: ["latin"],
-  weight: ["400"],
-});
 
 export const metadata = {
   title: {
@@ -27,7 +17,7 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body className={`${outfit.variable} ${birthstone.variable} font-sans antialiased`}>
+      <body className="font-sans antialiased">
         <SiteChrome>{children}</SiteChrome>
         <Toaster />
       </body>
