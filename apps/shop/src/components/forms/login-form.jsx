@@ -119,7 +119,7 @@ const LoginForm = ({ initialMode = "login" }) => {
   return (
     <div className="mx-auto max-w-[450px] font-semibold space-y-2 py-6">
       {/* Header */}
-      <div className="space-y-1">
+      <div className="space-y-1 text-center">
         <h1 className="text-2xl font-semibold tracking-tight">
           {isLogin ? "Welcome back" : "Create your free account"}
         </h1>
