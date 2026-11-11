@@ -1,0 +1,30 @@
+{
+  "$jsonSchema": {
+    "bsonType": "object",
+    "title": "brand_models: ambassadors who wear Vela Noire. The products they wear are embedded.",
+    "required": ["name", "slug", "isActive"],
+    "properties": {
+      "name":         { "bsonType": "string" },
+      "slug":         { "bsonType": "string" },
+      "bio":          { "bsonType": "string" },
+      "nationality":  { "bsonType": "string" },
+      "profileImage": { "bsonType": "string" },
+      "images":       { "bsonType": "array", "items": { "bsonType": "string" } },
+      "videos":       { "bsonType": "array", "items": { "bsonType": "string" } },
+      "isActive":     { "bsonType": "bool" },
+      "products": {
+        "bsonType": "array",
+        "items": {
+          "bsonType": "object",
+          "required": ["productId"],
+          "properties": {
+            "productId": { "bsonType": "objectId" },
+            "caption":   { "bsonType": "string" },
+            "linkImage": { "bsonType": "string" }
+          }
+        }
+      },
+      "createdAt": { "bsonType": "date" }
+    }
+  }
+}

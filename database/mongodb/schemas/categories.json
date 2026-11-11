@@ -1,0 +1,14 @@
+{
+  "$jsonSchema": {
+    "bsonType": "object",
+    "title": "categories: the kinds of things Vela Noire sells",
+    "required": ["name", "slug", "displayOrder"],
+    "properties": {
+      "name":         { "bsonType": "string" },
+      "slug":         { "enum": ["abaya", "perfume", "handbag", "bracelet", "shayla", "shoes", "accessory"] },
+      "description":  { "bsonType": "string" },
+      "image":        { "bsonType": ["string", "null"] },
+      "displayOrder": { "bsonType": "int", "minimum": 0 }
+    }
+  }
+}

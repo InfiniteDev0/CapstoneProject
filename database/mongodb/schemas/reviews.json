@@ -1,0 +1,17 @@
+{
+  "$jsonSchema": {
+    "bsonType": "object",
+    "title": "reviews: star ratings and comments. userId is the MySQL users.id.",
+    "required": ["productId", "userId", "rating", "createdAt"],
+    "properties": {
+      "productId":        { "bsonType": "objectId" },
+      "userId":           { "bsonType": ["int", "long"], "minimum": 1, "description": "MySQL users.id" },
+      "userName":         { "bsonType": "string", "description": "Copied for display" },
+      "rating":           { "bsonType": "int", "minimum": 1, "maximum": 5 },
+      "title":            { "bsonType": "string", "maxLength": 120 },
+      "comment":          { "bsonType": "string", "maxLength": 2000 },
+      "verifiedPurchase": { "bsonType": "bool" },
+      "createdAt":        { "bsonType": "date" }
+    }
+  }
+}

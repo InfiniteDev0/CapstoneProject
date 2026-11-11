@@ -1,0 +1,19 @@
+{
+  "$jsonSchema": {
+    "bsonType": "object",
+    "title": "clickstream_events: every view, search, cart and purchase action. Feeds the AI.",
+    "required": ["sessionId", "type", "device", "timestamp"],
+    "properties": {
+      "userId":    { "bsonType": ["int", "long", "null"], "description": "MySQL users.id; null for guests" },
+      "sessionId": { "bsonType": "string" },
+      "type":      { "enum": ["VIEW", "SEARCH", "ADD_TO_CART", "REMOVE_FROM_CART", "WISHLIST", "PURCHASE"] },
+      "productId": { "bsonType": ["objectId", "null"] },
+      "category":  { "bsonType": ["string", "null"] },
+      "query":     { "bsonType": ["string", "null"], "description": "Search text, for SEARCH events" },
+      "orderId":   { "bsonType": ["int", "long", "null"], "description": "MySQL orders.id, for PURCHASE events" },
+      "device":    { "enum": ["DESKTOP", "MOBILE", "TABLET"] },
+      "page":      { "bsonType": "string" },
+      "timestamp": { "bsonType": "date" }
+    }
+  }
+}

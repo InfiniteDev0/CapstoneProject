@@ -1,0 +1,31 @@
+{
+  "$jsonSchema": {
+    "bsonType": "object",
+    "title": "collections: the themed collections. Seasonal lines are embedded.",
+    "required": ["name", "slug"],
+    "properties": {
+      "name":        { "bsonType": "string" },
+      "slug":        { "bsonType": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$" },
+      "tagline":     { "bsonType": "string" },
+      "description": { "bsonType": "string" },
+      "audience":    { "bsonType": "string" },
+      "palette":     { "bsonType": "array", "items": { "bsonType": "string" } },
+      "heroImage":   { "bsonType": ["string", "null"] },
+      "heroVideo":   { "bsonType": ["string", "null"] },
+      "lines": {
+        "bsonType": "array",
+        "description": "Only on the Seasonal collection",
+        "items": {
+          "bsonType": "object",
+          "required": ["name", "season"],
+          "properties": {
+            "name":    { "bsonType": "string" },
+            "season":  { "enum": ["SUMMER", "WINTER", "AUTUMN", "SPRING"] },
+            "theme":   { "bsonType": "string" },
+            "palette": { "bsonType": "array", "items": { "bsonType": "string" } }
+          }
+        }
+      }
+    }
+  }
+}
