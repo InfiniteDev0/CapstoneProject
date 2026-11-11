@@ -18,7 +18,13 @@
   - `admin/brandDetails.md` is the **brand bible**. Copy it to `docs/`.
 
 ## What we are building
-**Vela Noire** is my luxury modest-fashion brand: "Middle Eastern Louis Vuitton". Abayas, perfume, handbags, bracelets, shayla, shoes and accessories. Tagline: "Luxury Reimagined for Her". Collections: Rare Collectibles, Infinity Bride, Modern Muse, Lux Infinity, Traditions Reimagined, Simplicity Speaks, and Seasonal (Desert Bloom, Velvet Moon, Amber Luxe, Floral Grace).
+**Vela Noire** is my luxury modest-fashion brand: "Middle Eastern Louis Vuitton". Abayas, perfume, handbags, bracelets, shayla, shoes and accessories. Tagline: "Luxury Reimagined for Her". Collections (we use only these **4**):
+1. **Seasonal**: Desert Bloom (summer), Velvet Moon (winter), Amber Luxe (autumn), Floral Grace (spring)
+2. **Modern Muse**
+3. **Traditions Reimagined**
+4. **Simplicity Speaks**
+
+Rare Collectibles, Lux Infinity and Infinity Bride are **dropped**. Use only the 4 above in the seed data (Phase 2 and later).
 
 The school capstone is called **"E-Commerce Intelligent Analytics & Personalization Suite"**. Vela Noire is the store we use for it. Deadline: **13 Dec 2026**, but I want it done in **one week**.
 
@@ -135,3 +141,7 @@ Update this checklist at the end of each phase.
 - Small commits with clear messages (`feat:`, `fix:`, `chore:`, `docs:`).
 - Keep the luxury look and feel. Don't redesign what works; copy it and tidy it.
 - Skip anything not needed for the spec or the demo (real payments, emails, mobile app).
+
+## Later ideas (not now)
+- **Seasonal theme:** the shop's colours and hero change with the current season. This is a rule based on the date, not ML (December → winter → Velvet Moon colours).
+- **Seasonal personalisation:** the recommender ranks which seasonal drop each customer sees first, based on their history. The theme follows the calendar; the products follow the person.
