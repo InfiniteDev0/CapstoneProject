@@ -2,8 +2,9 @@
 //  Vela Noire: MongoDB sample data (the "menu album")
 // =============================================================================
 //  Real Vela Noire catalogue taken from docs/brandDetails.md: 7 categories,
-//  7 collections (with the 4 seasonal lines), 21 products, a few reviews and
-//  clickstream events for the two demo customers in MySQL.
+//  4 collections (Seasonal with its 4 lines, Modern Muse, Traditions Reimagined,
+//  Simplicity Speaks), 21 products, a few reviews and clickstream events for
+//  the two demo customers in MySQL.
 //
 //  Run AFTER init.js:   mongosh --file database/mongodb/seed.js
 //  ⚠ Clears and refills every collection.
@@ -73,18 +74,17 @@ const categories = [
 // -----------------------------------------------------------------------------
 const collections = [
   {
-    slug: "rare-collectibles", name: "Rare Collectibles",
-    tagline: "Dropped once a year. Never restocked.",
-    description: "Exclusive limited-edition sets: one abaya, one perfume and one accessory, sold together only. 30 to 50 sets per year.",
-    audience: "Collectors who want something no one else has",
-    palette: ["Gold", "Black", "Blush"], heroImage: img("A1.webp"),
-  },
-  {
-    slug: "infinity-bride", name: "Infinity Bride",
-    tagline: "Fresh, clean, soft, pure.",
-    description: "Bridal abayas in white, cream and pearl beige with gold or silver thread, for newlyweds and brides-to-be.",
-    audience: "Newlyweds or brides-to-be",
-    palette: ["Pearl", "Gold", "White", "Soft Beige"], heroImage: img("A4.webp"),
+    slug: "seasonal", name: "Seasonal",
+    tagline: "A new story every season.",
+    description: "Each season brings a 2-piece abaya, a signature perfume, a purse and a bracelet.",
+    audience: "Everyone",
+    palette: [], heroImage: img("abaya.webp"),
+    lines: [
+      { name: "Desert Bloom", season: "SUMMER", theme: "Light, breathable, elegant", palette: ["Sand beige", "White", "Aqua", "Gold"] },
+      { name: "Velvet Moon", season: "WINTER", theme: "Cozy, deep elegance", palette: ["Black", "Midnight blue", "Emerald", "Silver"] },
+      { name: "Amber Luxe", season: "AUTUMN", theme: "Warm, rich, golden", palette: ["Burgundy", "Caramel", "Olive green"] },
+      { name: "Floral Grace", season: "SPRING", theme: "Soft, floral, feminine", palette: ["Lavender", "Peach", "Rose pink", "Mint green"] },
+    ],
   },
   {
     slug: "modern-muse", name: "Modern Muse",
@@ -92,13 +92,6 @@ const collections = [
     description: "Tailored cuts, belt options, muted colours and lightweight fabrics.",
     audience: "Urban, professional and trendy Muslim women",
     palette: ["Taupe", "Black", "Soft Grey", "Dusty Rose"], heroImage: img("A2.webp"),
-  },
-  {
-    slug: "lux-infinity", name: "Lux Infinity",
-    tagline: "For the moments you want to feel special.",
-    description: "Velvet, heavy silk, unique cuts and dramatic sleeves in jewel tones with gold stitching.",
-    audience: "Premium shoppers",
-    palette: ["Royal Blue", "Gold", "Emerald", "Maroon"], heroImage: img("A1.webp"),
   },
   {
     slug: "traditions-reimagined", name: "Traditions Reimagined",
@@ -113,19 +106,6 @@ const collections = [
     description: "Straight-cut abayas with minimal lines, no embroidery and neutral tones in breathable cotton-linen.",
     audience: "Minimalist women who love clean cuts and comfort",
     palette: ["Sand", "Ivory", "Charcoal", "Soft Sage"], heroImage: img("A4.webp"),
-  },
-  {
-    slug: "seasonal", name: "Seasonal",
-    tagline: "A new story every season.",
-    description: "Each season brings a 2-piece abaya, a signature perfume, a purse and a bracelet.",
-    audience: "Everyone",
-    palette: [], heroImage: img("abaya.webp"),
-    lines: [
-      { name: "Desert Bloom", season: "SUMMER", theme: "Light, breathable, elegant", palette: ["Sand beige", "White", "Aqua", "Gold"] },
-      { name: "Velvet Moon", season: "WINTER", theme: "Cozy, deep elegance", palette: ["Black", "Midnight blue", "Emerald", "Silver"] },
-      { name: "Amber Luxe", season: "AUTUMN", theme: "Warm, rich, golden", palette: ["Burgundy", "Caramel", "Olive green"] },
-      { name: "Floral Grace", season: "SPRING", theme: "Soft, floral, feminine", palette: ["Lavender", "Peach", "Rose pink", "Mint green"] },
-    ],
   },
 ].map((c) => ({ heroVideo: null, ...c }));
 
@@ -176,6 +156,30 @@ const products = [
     tags: ["winter", "onyx", "gemstone"],
     images: [img("accessories.webp")],
     variants: [v("VN-BRC-VM-04-ONX", "Onyx", "#16161a", 25, "accessories.webp", true)],
+  }),
+  product("105", {
+    name: "Malikat Al-Layl Abaya", slug: "malikat-al-layl-abaya", category: "abaya",
+    collection: "seasonal", season: "WINTER", seasonalLine: "Velvet Moon",
+    description: "Velvet and silk mix in jewel tones with gold stitching and dramatic sleeves.",
+    basePrice: usd(240), isLimitedEdition: true,
+    tags: ["winter", "velvet", "silk", "gold-stitching", "evening"],
+    images: [img("A1.webp")],
+    abaya: abaya("Velvet and silk", ["OPEN_FRONT"]),
+    variants: [
+      v("VN-ABY-VM-05-WIN", "Wine", "#5a1a2b", 5, "A1.webp", true),
+      v("VN-ABY-VM-05-NVY", "Royal Navy", "#1d2a5c", 5, "A1.webp"),
+      v("VN-ABY-VM-05-EMR", "Emerald", "#0f4d3c", 4, "A1.webp"),
+    ],
+  }),
+  product("106", {
+    name: "Malikat Al-Layl Eau de Parfum", slug: "malikat-al-layl-eau-de-parfum", category: "perfume",
+    collection: "seasonal", season: "WINTER", seasonalLine: "Velvet Moon",
+    description: "Oud, amber and saffron in a black bottle with gold edges and a heavy cap.",
+    basePrice: usd(85),
+    tags: ["winter", "oud", "amber", "saffron"],
+    images: [img("fragrance.webp")],
+    perfume: perfume(["Saffron"], ["Exotic Florals"], ["Oud", "Amber"]),
+    variants: [v("VN-PRF-VM-06-50", "50 ml", "#1a1a1a", 15, "fragrance.webp", true)],
   }),
 
   // ── Seasonal · Summer · Desert Bloom ────────────────────────────────────────
@@ -233,31 +237,6 @@ const products = [
     ],
   }),
 
-  // ── Infinity Bride ──────────────────────────────────────────────────────────
-  product("301", {
-    name: "Pearl Bride Abaya", slug: "pearl-bride-abaya", category: "abaya",
-    collection: "infinity-bride",
-    description: "Embellished white abaya with subtle lace and pearl trim, in flowing satin with gold thread embroidery.",
-    basePrice: usd(220), isBestSeller: true,
-    tags: ["bridal", "pearl", "lace", "satin", "wedding"],
-    images: [img("A4.webp")],
-    abaya: abaya("Satin", ["OPEN_FRONT", "CLOSED_FRONT"]),
-    variants: [
-      v("VN-ABY-IB-01-PRL", "Pearl White", "#f8f6f0", 6, "A4.webp", true),
-      v("VN-ABY-IB-01-IVR", "Ivory Cream", "#efe6d2", 6, "A4.webp"),
-    ],
-  }),
-  product("302", {
-    name: "Farhat Zifaf Eau de Parfum", slug: "farhat-zifaf-eau-de-parfum", category: "perfume",
-    collection: "infinity-bride",
-    description: "Fresh floral with creamy musk, in a glass bottle with a gold top and white ribbon.",
-    basePrice: usd(65),
-    tags: ["bridal", "floral", "musk", "jasmine"],
-    images: [img("fragrance.webp")],
-    perfume: perfume(["Jasmine"], ["White Florals"], ["Creamy Musk"]),
-    variants: [v("VN-PRF-IB-02-50", "50 ml", "#f5efe1", 20, "fragrance.webp", true)],
-  }),
-
   // ── Modern Muse ─────────────────────────────────────────────────────────────
   product("401", {
     name: "Muse Belted Abaya", slug: "muse-belted-abaya", category: "abaya",
@@ -272,32 +251,6 @@ const products = [
       v("VN-ABY-MM-01-RSE", "Dusty Rose", "#c9a19c", 10, "A2.webp"),
       v("VN-ABY-MM-01-GRY", "Soft Grey", "#9a9a9a", 10, "A2.webp"),
     ],
-  }),
-
-  // ── Lux Infinity ────────────────────────────────────────────────────────────
-  product("501", {
-    name: "Malikat Al-Layl Abaya", slug: "malikat-al-layl-abaya", category: "abaya",
-    collection: "lux-infinity",
-    description: "Velvet and silk mix in jewel tones with gold stitching and dramatic sleeves.",
-    basePrice: usd(240), isLimitedEdition: true,
-    tags: ["luxury", "velvet", "silk", "gold-stitching", "evening"],
-    images: [img("A1.webp")],
-    abaya: abaya("Velvet and silk", ["OPEN_FRONT"]),
-    variants: [
-      v("VN-ABY-LX-01-WIN", "Wine", "#5a1a2b", 5, "A1.webp", true),
-      v("VN-ABY-LX-01-NVY", "Royal Navy", "#1d2a5c", 5, "A1.webp"),
-      v("VN-ABY-LX-01-EMR", "Emerald", "#0f4d3c", 4, "A1.webp"),
-    ],
-  }),
-  product("502", {
-    name: "Malikat Al-Layl Eau de Parfum", slug: "malikat-al-layl-eau-de-parfum", category: "perfume",
-    collection: "lux-infinity",
-    description: "Oud, amber and saffron in a black bottle with gold edges and a heavy cap.",
-    basePrice: usd(85),
-    tags: ["luxury", "oud", "amber", "saffron"],
-    images: [img("fragrance.webp")],
-    perfume: perfume(["Saffron"], ["Exotic Florals"], ["Oud", "Amber"]),
-    variants: [v("VN-PRF-LX-02-50", "50 ml", "#1a1a1a", 15, "fragrance.webp", true)],
   }),
 
   // ── Traditions Reimagined ───────────────────────────────────────────────────
@@ -323,6 +276,27 @@ const products = [
     images: [img("fragrance.webp")],
     perfume: perfume(["Spices"], ["Rose"], ["Oud", "Frankincense", "Sandalwood"]),
     variants: [v("VN-PRF-TR-02-50", "50 ml", "#7a4a2a", 25, "fragrance.webp", true)],
+  }),
+  product("603", {
+    name: "Heritage Box Purse", slug: "heritage-box-purse", category: "handbag",
+    collection: "traditions-reimagined",
+    description: "A vintage-style box purse with cultural motifs and gold hardware.",
+    basePrice: usd(75),
+    tags: ["heritage", "box-purse", "vintage", "gold-hardware"],
+    images: [img("accessories.webp")],
+    variants: [
+      v("VN-BAG-TR-03-BRN", "Deep Brown", "#3e2a1e", 10, "accessories.webp", true),
+      v("VN-BAG-TR-03-BLK", "Black", "#0d0d0d", 10, "accessories.webp"),
+    ],
+  }),
+  product("604", {
+    name: "Calligraphy Bead Bracelet", slug: "calligraphy-bead-bracelet", category: "bracelet",
+    collection: "traditions-reimagined",
+    description: "A beaded bracelet finished with a small Arabic calligraphy tag.",
+    basePrice: usd(30),
+    tags: ["heritage", "beaded", "calligraphy"],
+    images: [img("accessories.webp")],
+    variants: [v("VN-BRC-TR-04-OLV", "Olive", "#6b6b3a", 25, "accessories.webp", true)],
   }),
 
   // ── Simplicity Speaks ───────────────────────────────────────────────────────
@@ -369,6 +343,18 @@ const products = [
     images: [img("accessories.webp")],
     variants: [v("VN-BAG-SIM-01-TAU", "Taupe", "#8b7d6b", 18, "accessories.webp", true)],
   }),
+  product("706", {
+    name: "Sukun Silver Watch", slug: "sukun-silver-watch", category: "accessory",
+    collection: "simplicity-speaks",
+    description: "A plain face on a slim strap. Nothing extra.",
+    basePrice: usd(90),
+    tags: ["minimal", "watch", "silver"],
+    images: [img("accessories.webp")],
+    variants: [
+      v("VN-WCH-SS-05-SLV", "Silver", "#c0c0c0", 12, "accessories.webp", true),
+      v("VN-WCH-SS-05-WHT", "White", "#f4f4f2", 12, "accessories.webp"),
+    ],
+  }),
 
   // ── Shayla (worn with any collection) ───────────────────────────────────────
   product("705", {
@@ -382,24 +368,6 @@ const products = [
       v("VN-SHY-01-BLK", "Black", "#0d0d0d", 50, "shayla.webp", true),
       v("VN-SHY-01-SND", "Sand", "#d6c4a8", 40, "shayla.webp"),
     ],
-  }),
-
-  // ── Rare Collectibles (sold as a set only) ──────────────────────────────────
-  product("801", {
-    name: "Midnight Ayah Collectible Set", slug: "midnight-ayah-collectible-set", category: "abaya",
-    collection: "rare-collectibles",
-    description: "Noor in the Dark Set. Mystical and modern, spiritual luxury. Never restocked once sold out.",
-    story: "Deep black velvet with Quranic calligraphy lining inside the sleeves, packed in a matte black box with silver foil verses from Surah Al-Fajr.",
-    basePrice: usd(310), isLimitedEdition: true, isNew: true,
-    tags: ["rare", "limited-edition", "set", "velvet", "calligraphy"],
-    images: [img("abaya.webp")],
-    abaya: abaya("Velvet", ["OPEN_FRONT"]),
-    setItems: [
-      { category: "abaya", description: "Deep black velvet abaya with Quranic calligraphy lining inside the sleeves" },
-      { category: "perfume", description: "Night jasmine, vanilla and musk blend" },
-      { category: "bracelet", description: "Onyx crystal bracelet with Arabic engraving" },
-    ],
-    variants: [v("VN-SET-RC-01-BLK", "Noir", "#000000", 40, "abaya.webp", true)],
   }),
 ];
 
