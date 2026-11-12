@@ -1,5 +1,6 @@
 package com.velanoire.api.exception;
 
+import jakarta.validation.ConstraintViolationException;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.HandlerMethodValidationException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
@@ -38,9 +40,41 @@ public class GlobalExceptionHandler {
         return build(HttpStatus.BAD_REQUEST, message.isBlank() ? "Invalid request" : message);
     }
 
+    /** A rule on a URL part failed, e.g. /products/abc/reviews where abc isn't a product id. */
+    @ExceptionHandler(HandlerMethodValidationException.class)
+    public ResponseEntity<ApiError> handleMethodValidation(HandlerMethodValidationException ex) {
+        String message = ex.getParameterValidationResults().stream()
+                .flatMap(r -> r.getResolvableErrors().stream()
+                        .map(e -> r.getMethodParameter().getParameterName() + ": " + e.getDefaultMessage()))
+                .collect(Collectors.joining("; "));
+        return build(HttpStatus.BAD_REQUEST, message.isBlank() ? "Invalid request" : message);
+    }
+
+    /** The same kind of rule failure, raised by Spring's method-validation proxy. */
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<ApiError> handleConstraint(ConstraintViolationException ex) {
+        String message = ex.getConstraintViolations().stream()
+                .map(v -> lastPart(v.getPropertyPath().toString()) + ": " + v.getMessage())
+                .collect(Collectors.joining("; "));
+        return build(HttpStatus.BAD_REQUEST, message.isBlank() ? "Invalid request" : message);
+    }
+
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ApiError> handleUnreadable(HttpMessageNotReadableException ex) {
+        // e.g. "type": "DANCE" when type must be VIEW, SEARCH... : say which options exist
+        String detail = ex.getMostSpecificCause().getMessage();
+        if (detail != null && detail.contains("not one of the values accepted")) {
+            int start = detail.indexOf('[');
+            int end = detail.indexOf(']', start);
+            String options = start >= 0 && end > start ? detail.substring(start + 1, end) : "see the docs";
+            return build(HttpStatus.BAD_REQUEST, "A value is not one of the allowed options: " + options);
+        }
         return build(HttpStatus.BAD_REQUEST, "Request body is missing or is not valid JSON");
+    }
+
+    private static String lastPart(String path) {
+        int dot = path.lastIndexOf('.');
+        return dot >= 0 ? path.substring(dot + 1) : path;
     }
 
     @ExceptionHandler({MethodArgumentTypeMismatchException.class, MissingServletRequestParameterException.class})
