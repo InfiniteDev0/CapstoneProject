@@ -25,15 +25,19 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { notify } from "@/lib/toast";
+import { useAdminAuth } from "@/components/providers/admin-auth";
 
-export function NavUser({ user }) {
+/** The black account card at the bottom of the sidebar: the signed-in admin, and Log out. */
+export function NavUser() {
   const { isMobile } = useSidebar();
   const router = useRouter();
+  const { user: me, logout } = useAdminAuth();
+  const user = { name: me?.name ?? "Admin", email: me?.email ?? "", avatar: "" };
 
   function handleSignOut() {
-    // Phase 3: also clear the saved JWT here.
+    logout();
     notify.success("Signed out");
-    router.push("/login");
+    router.replace("/login");
   }
 
   return (

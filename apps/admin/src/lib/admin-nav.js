@@ -9,14 +9,6 @@ import {
   Users,
 } from "lucide-react";
 
-// Placeholder until the admin login is wired to the Java JWT (Phase 4)
-export const adminUser = {
-  name: "Vela Noire",
-  email: "admin@velanoire.local",
-  role: "Admin",
-  avatar: "",
-};
-
 // The capstone admin portal: every item maps to a requirement in the school spec.
 // Used by the sidebar, the top bar's page title and the search palette.
 export const navMain = [

@@ -3,6 +3,7 @@ import "@fontsource-variable/outfit";
 import "@fontsource-variable/geist-mono";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
+import { AdminAuthProvider } from "@/components/providers/admin-auth";
 
 export const metadata = {
   title: { default: "Vela Noire Admin", template: "%s | Vela Noire Admin" },
@@ -19,7 +20,7 @@ export default function RootLayout({ children }) {
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
       <body className="min-h-full bg-zinc-50 font-sans dark:bg-background">
-        {children}
+        <AdminAuthProvider>{children}</AdminAuthProvider>
         <Toaster />
       </body>
     </html>

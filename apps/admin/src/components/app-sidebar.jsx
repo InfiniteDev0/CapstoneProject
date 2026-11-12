@@ -4,7 +4,7 @@ import { NavMain } from "@/components/nav-main";
 import { NavUser } from "@/components/nav-user";
 import { SidebarToggle } from "@/components/sidebar-toggle";
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader } from "@/components/ui/sidebar";
-import { adminUser, navMain } from "@/lib/admin-nav";
+import { navMain } from "@/lib/admin-nav";
 import { cn } from "@/lib/utils";
 
 /**
@@ -32,7 +32,7 @@ export function AppSidebar({ className, ...props }) {
         <NavMain items={navMain} />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={adminUser} />
+        <NavUser />
       </SidebarFooter>
     </Sidebar>
   );

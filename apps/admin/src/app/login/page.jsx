@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import Image from "next/image";
 import { LoginForm } from "@/components/login-form";
 
@@ -10,7 +11,9 @@ export default function LoginPage() {
         <div className="flex items-center gap-2 self-center">
           <Image src="/logo.png" width={200} height={75} alt="Vela Noire" priority />
         </div>
-        <LoginForm />
+        <Suspense>
+          <LoginForm />
+        </Suspense>
       </div>
     </div>
   );

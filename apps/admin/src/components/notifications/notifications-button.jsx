@@ -16,7 +16,8 @@ import { useKeyShortcut } from "@/hooks/use-key-shortcut";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { AnimatedList } from "@/components/motion/animated-list";
 import { SwipeNotification, SwipeReveal } from "./swipe";
-import { adminUser } from "@/lib/admin-nav";
+import { useAdminAuth } from "@/components/providers/admin-auth";
+import { useApi } from "@/hooks/use-api";
 import { notify } from "@/lib/toast";
 import { cn } from "@/lib/utils";
 import { NotificationCard } from "./notification-card";
@@ -61,8 +62,17 @@ export function NotificationsButton({ className, shortcut = false }) {
   const isMobile = useIsMobile();
   useKeyShortcut("n", () => setOpen((o) => !o), { enabled: shortcut });
 
+  // Live data: paid orders waiting to be prepared, and colours running low (refreshed when the panel opens)
+  const { user } = useAdminAuth();
+  const orders = useApi(user ? `/api/admin/orders?status=PAID&size=10&v=${open ? 1 : 0}` : null);
+  const lowStock = useApi(user ? `/api/admin/inventory?atOrBelow=5&v=${open ? 1 : 0}` : null);
   const today = todayIso();
-  const all = buildNotifications(today, adminUser.name.split(" ")[0]);
+  const all = buildNotifications({
+    today,
+    person: user?.name?.split(" ")[0],
+    orders: orders.data?.items ?? [],
+    lowStock: lowStock.data ?? [],
+  });
   const visible = all.filter(({ id }) => !cleared.has(id));
   const unread = visible.filter(({ id }) => !read.has(id));
 
@@ -228,7 +238,7 @@ export function NotificationsButton({ className, shortcut = false }) {
             </span>
             <p className="font-medium text-foreground">You&apos;re all caught up</p>
             <p className="max-w-64 text-sm text-muted-foreground">
-              New orders, low stock, customers at risk and new reviews show up here.
+              New orders to prepare and low stock show up here. Customers at risk join in Phase 7.
             </p>
           </div>
         )}

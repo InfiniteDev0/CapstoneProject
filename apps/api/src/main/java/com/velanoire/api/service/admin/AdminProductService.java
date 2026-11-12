@@ -48,13 +48,14 @@ public class AdminProductService {
     private final CartItemRepository cartItems;
     private final WishlistItemRepository wishlistItems;
 
-    public PageResponse<AdminProductRow> list(String q, String category, String status, int page, int size) {
+    public PageResponse<AdminProductRow> list(String q, String category, String collection, String status, int page, int size) {
         List<Criteria> rules = new ArrayList<>();
         if (q != null && !q.isBlank()) {
             String text = Pattern.quote(q.trim());
             rules.add(new Criteria().orOperator(Criteria.where("name").regex(text, "i"), Criteria.where("variants.sku").regex(text, "i")));
         }
         if (category != null && !category.isBlank()) rules.add(Criteria.where("category").is(category));
+        if (collection != null && !collection.isBlank()) rules.add(Criteria.where("collection").is(collection));
         if (status != null && !status.isBlank()) rules.add(Criteria.where("status").is(status));
         Query query = rules.isEmpty() ? new Query() : Query.query(new Criteria().andOperator(rules));
         long total = mongo.count(query, Product.class);

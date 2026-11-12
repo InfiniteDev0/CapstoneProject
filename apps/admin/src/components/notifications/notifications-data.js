@@ -3,9 +3,11 @@
 import { useSyncExternalStore } from "react";
 
 /**
- * The admin's notifications. Until the Java API sends real alerts (Phase 7),
- * these are sample alerts built from the seed data: Amira's order, the low
- * Malikat Al-Layl stock, Layla going quiet, Amira's review.
+ * The admin's notifications, built from live data:
+ *   - every PAID order still waiting to be prepared  → "New order VN-…"
+ *   - every colour with 5 or fewer pieces left        → "Low stock: …"
+ *   - a welcome for the signed-in admin
+ * Phase 7 adds "customer at risk" alerts from the churn model.
  *
  * Each: { id, kind, title, details: [{label, value}], action, href, date: "YYYY-MM-DD" }
  */
@@ -14,69 +16,53 @@ export function todayIso() {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 }
 
-export function buildNotifications(today = todayIso(), person = "there") {
-  return [
-    {
-      id: "welcome",
+const money = (n) => new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(Number(n ?? 0));
+
+export function buildNotifications({ today = todayIso(), person, orders = [], lowStock = [] }) {
+  const list = [];
+  if (person) {
+    list.push({
+      id: `welcome-${today}`,
       kind: "welcome",
       title: `Welcome back, ${person}`,
       details: [
-        { label: "Role", value: "Admin" },
-        { label: "Store", value: "Vela Noire" },
+        { label: "Orders to prepare", value: String(orders.length) },
+        { label: "Colours low on stock", value: String(lowStock.length) },
       ],
       action: "Open dashboard",
       href: "/dashboard",
       date: today,
-    },
-    {
-      id: "stock-105-emr",
-      kind: "stock",
-      title: "Low stock: Malikat Al-Layl Abaya",
+    });
+  }
+  for (const o of orders) {
+    list.push({
+      id: `order-${o.id}`,
+      kind: "order",
+      title: `New order ${o.orderNumber}`,
       details: [
-        { label: "Colour", value: "Emerald" },
-        { label: "Left", value: "4 pieces" },
+        { label: "Customer", value: o.customerName ?? "—" },
+        { label: "Total", value: money(o.total) },
+      ],
+      action: "Prepare order",
+      href: `/dashboard/orders/${o.id}`,
+      date: (o.createdAt ?? "").slice(0, 10) || today,
+    });
+  }
+  for (const r of lowStock.slice(0, 8)) {
+    list.push({
+      id: `stock-${r.sku}-${r.stock}`,
+      kind: "stock",
+      title: `${r.stock === 0 ? "Sold out" : "Low stock"}: ${r.productName}`,
+      details: [
+        { label: "Colour", value: r.colorName },
+        { label: "Left", value: `${r.stock} piece${r.stock === 1 ? "" : "s"}` },
       ],
       action: "Restock",
       href: "/dashboard/products/inventory",
       date: today,
-    },
-    {
-      id: "churn-3",
-      kind: "churn",
-      title: "Layla may stop shopping",
-      details: [
-        { label: "Customer", value: "Layla Mohamed" },
-        { label: "Last visit", value: "15 Aug 2026" },
-      ],
-      action: "Send an offer",
-      href: "/dashboard/churn",
-      date: "2026-11-09",
-    },
-    {
-      id: "review-101-2",
-      kind: "review",
-      title: "New 5★ review",
-      details: [
-        { label: "Product", value: "Velvet Moon Abaya" },
-        { label: "From", value: "Amira H." },
-      ],
-      action: "Read review",
-      href: "/dashboard/products",
-      date: "2026-10-12",
-    },
-    {
-      id: "order-1",
-      kind: "order",
-      title: "New order VN-2026-000001",
-      details: [
-        { label: "Customer", value: "Amira Hassan" },
-        { label: "Total", value: "$200.00" },
-      ],
-      action: "View order",
-      href: "/dashboard/orders",
-      date: "2026-10-02",
-    },
-  ];
+    });
+  }
+  return list;
 }
 
 /** "Today", "Yesterday" or "2 Oct". */

@@ -39,11 +39,12 @@ public class AdminProductController {
     private final AdminProductService products;
 
     @GetMapping("/products")
-    @Operation(summary = "All products, any status (search name or SKU)")
+    @Operation(summary = "All products, any status (search name or SKU; filter by category, collection, status)")
     public PageResponse<AdminProductRow> list(@RequestParam(required = false) String q,
-            @RequestParam(required = false) String category, @RequestParam(required = false) String status,
+            @RequestParam(required = false) String category, @RequestParam(required = false) String collection,
+            @RequestParam(required = false) String status,
             @RequestParam(defaultValue = "0") @Min(0) int page, @RequestParam(defaultValue = "20") @Min(1) @Max(100) int size) {
-        return products.list(q, category, status, page, size);
+        return products.list(q, category, collection, status, page, size);
     }
 
     @GetMapping("/products/{id}")
