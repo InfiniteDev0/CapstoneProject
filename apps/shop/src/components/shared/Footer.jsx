@@ -58,7 +58,7 @@ const socialIcons = [
 ];
 
 const linkColumns = [
-  { title: "Services", links: ["Shipment", "Personalization", "Art of Gifting"] },
+  { title: "Services", links: ["Shipment"] },
   { title: "About Vela Noire", links: ["Our Values", "Arts & Culture", "Latest News", "Foundation History"] },
 ];
 

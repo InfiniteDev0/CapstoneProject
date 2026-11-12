@@ -8,10 +8,7 @@ const bannerContent = {
   "/": "Free Shipping & Return on All Orders Above 75$",
   "/men": "Shop the latest in Men’s luxury wear. Free shipping on all orders above $75!",
   "/women": "Discover our Women’s collection. Enjoy exclusive offers and free returns!",
-  "/collections": "Explore curated Collections. Limited-time deals available now!",
-  "/discover": "Discover new arrivals and trending styles. Shop now!",
-  "/gifts": "Perfect Gifts for every occasion. Free gift wrapping on all orders!",
-  "/sale": "Big Sale! Up to 50% off select items. Don’t miss out!",
+  "/collections": "Explore our curated Collections.",
 };
 
 export default function Banner() {

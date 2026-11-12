@@ -8,12 +8,7 @@ import {
   UserRoundCheck,
   Sparkles,
   Layers,
-  Gem,
   Watch,
-  Tag,
-  Wine,
-  Gift,
-  PartyPopper,
 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
@@ -29,12 +24,7 @@ export default function Navbar() {
   const menuItems = [
     { label: "New & featured", path: "/new", icon: Sparkles },
     { label: "Our Collections", path: "/men", icon: Layers },
-    { label: "Rare Collectibles", path: "/women", icon: Gem },
     { label: "Accessories", path: "/collections", icon: Watch },
-    { label: "Sales and Deal", path: "/sale", icon: Tag },
-    { label: "VN Saloon", path: "/discover", icon: Wine },
-    { label: "Gifts and personalization", path: "/gifts", icon: Gift },
-    { label: "The VN Gala", path: "/gala", icon: PartyPopper },
   ];
 
   return (

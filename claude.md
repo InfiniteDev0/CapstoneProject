@@ -141,6 +141,7 @@ Update this checklist at the end of each phase.
 - Small commits with clear messages (`feat:`, `fix:`, `chore:`, `docs:`).
 - Keep the luxury look and feel. Don't redesign what works; copy it and tidy it.
 - Skip anything not needed for the spec or the demo (real payments, emails, mobile app).
+- **Toned down (removed from the shop, don't build):** The VN Gala, VN Saloon, Gifts & personalization services (monograms, gift wrap), Sales & Deals / flash-sale pages, and Rare Collectibles. The brand bible still mentions them; ignore those parts. (Still built: the AI "Recommended For You" personalisation and the admin retention discount, both required by the spec.)
 
 ## Later ideas (not now)
 - **Seasonal theme:** the shop's colours and hero change with the current season. This is a rule based on the date, not ML (December → winter → Velvet Moon colours).
