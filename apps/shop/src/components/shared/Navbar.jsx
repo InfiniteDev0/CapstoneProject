@@ -11,12 +11,26 @@ import {
   Watch,
 } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 
 
 export default function Navbar() {
   const [MenuState, setMenuState] = useState(false);
+  const menuRef = useRef(null); // the sliding menu panel
+  const toggleRef = useRef(null); // the Menu / Close button (it toggles by itself)
+
+  // Close the menu when the user clicks anywhere else on the screen
+  useEffect(() => {
+    if (!MenuState) return;
+    const handleClickOutside = (e) => {
+      const insideMenu = menuRef.current?.contains(e.target);
+      const onToggle = toggleRef.current?.contains(e.target);
+      if (!insideMenu && !onToggle) setMenuState(false);
+    };
+    document.addEventListener("pointerdown", handleClickOutside);
+    return () => document.removeEventListener("pointerdown", handleClickOutside);
+  }, [MenuState]);
   // Phase 3 wires this to the Java JWT login. Until then everyone is a guest.
   const isAuthenticated = false;
   const loading = false;
@@ -33,6 +47,7 @@ export default function Navbar() {
       <nav className="grid grid-cols-3  fixed w-full z-50 bg-white backdrop-blur-3xl items-center justify-between h-fit !py-2 !px-5 text-blue-950 transition-all duration-400">
         {/* menu button manager */}
         <div
+          ref={toggleRef}
           onClick={() => setMenuState(!MenuState)}
           className="w-fit h-fit px-2 py-2 flex flex-col cursor-pointer"
         >
@@ -78,6 +93,7 @@ export default function Navbar() {
       <AnimatePresence>
         {MenuState && (
           <motion.div
+            ref={menuRef}
             initial={{ x: -100, opacity: 0 }} // Start off-screen to the left
             animate={{ x: 0, opacity: 1 }} // Slide into view
             exit={{ x: -100, opacity: 0 }} // Slide back to the left on close
