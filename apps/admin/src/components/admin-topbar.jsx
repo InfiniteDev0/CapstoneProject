@@ -19,9 +19,6 @@ export function AdminTopBar({ onSearch }) {
   return (
     <div className="relative hidden h-12 shrink-0 items-center gap-2 px-4 md:flex">
       <Link href="/dashboard" aria-label="Vela Noire dashboard" className="flex shrink-0 items-center gap-2.5">
-        <span className="flex size-8 items-center justify-center rounded-lg bg-black text-xs tracking-tight text-white dark:bg-white dark:text-black">
-          VN
-        </span>
         <Image src="/logo.png" width={100} height={38} alt="Vela Noire" priority className="dark:invert" />
       </Link>
 
