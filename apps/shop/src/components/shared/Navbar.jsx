@@ -16,6 +16,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { useAuth } from "@/components/providers/AuthProvider";
+import { useCart } from "@/components/providers/CartProvider";
 import { notify } from "@/lib/toast";
 
 
@@ -37,6 +38,7 @@ export default function Navbar() {
   }, [MenuState]);
   // Who is shopping, from the Java JWT login (AuthProvider)
   const { user, isAuthenticated, loading, logout } = useAuth();
+  const { count } = useCart();
   const router = useRouter();
 
   const signOut = () => {
@@ -101,8 +103,13 @@ export default function Navbar() {
             </Link>
           )}
 
-          <Link href={"/cart"} aria-label="Shopping bag">
+          <Link href={"/cart"} aria-label={count > 0 ? `Shopping bag, ${count} items` : "Shopping bag"} className="relative">
             <HandbagIcon className="w-4 h-4" />
+            {count > 0 ? (
+              <span className="absolute -right-2 -top-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-black px-1 text-[9px] font-semibold text-white tabular-nums">
+                {count > 99 ? "99+" : count}
+              </span>
+            ) : null}
           </Link>
         </div>
       </nav>

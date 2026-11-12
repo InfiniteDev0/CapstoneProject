@@ -5,6 +5,7 @@ import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 import SiteChrome from "@/components/shared/SiteChrome";
 import { AuthProvider } from "@/components/providers/AuthProvider";
+import { CartProvider } from "@/components/providers/CartProvider";
 
 export const metadata = {
   title: {
@@ -20,7 +21,9 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body className="font-sans antialiased">
         <AuthProvider>
-          <SiteChrome>{children}</SiteChrome>
+          <CartProvider>
+            <SiteChrome>{children}</SiteChrome>
+          </CartProvider>
         </AuthProvider>
         <Toaster />
       </body>
