@@ -9,10 +9,16 @@ export const metadata = {
   description: "Admin dashboard for Vela Noire",
 };
 
+// Put the saved theme on <html> before the page paints, so dark mode doesn't flash white.
+const themeScript = `try{if(localStorage.getItem("vn-admin-theme")==="dark")document.documentElement.classList.add("dark")}catch(e){}`;
+
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className="h-full antialiased">
-      <body className="min-h-full bg-zinc-50 font-sans">
+    <html lang="en" className="h-full antialiased" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+      </head>
+      <body className="min-h-full bg-zinc-50 font-sans dark:bg-background">
         {children}
         <Toaster />
       </body>

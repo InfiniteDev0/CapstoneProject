@@ -39,6 +39,8 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
+  /* The pale grey of the main panel and the sidebar card (Barista's canvas) */
+  --color-canvas: var(--canvas);
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
@@ -75,17 +77,21 @@
   --chart-4: oklch(0.371 0 0);
   --chart-5: oklch(0.269 0 0);
   --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
+  --canvas: #f4f4f5;
+  /* Sidebar card: a clear light grey, with white pills for hover and the active page */
+  --sidebar: #ececee;
   --sidebar-foreground: oklch(0.145 0 0);
   --sidebar-primary: oklch(0.205 0 0);
   --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
+  --sidebar-accent: #ffffff;
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
 }
 
 .dark {
+  /* Native controls (select lists, date pickers, scrollbars) drawn dark too */
+  color-scheme: dark;
   --background: oklch(13.266% 0.02932 237.799);
   --foreground: oklch(0.985 0 0);
   --card: oklch(0.205 0 0);
@@ -109,6 +115,7 @@
   --chart-3: oklch(0.439 0 0);
   --chart-4: oklch(0.371 0 0);
   --chart-5: oklch(0.269 0 0);
+  --canvas: oklch(0.145 0 0);
   --sidebar: oklch(0.205 0 0);
   --sidebar-foreground: oklch(0.985 0 0);
   --sidebar-primary: oklch(0.488 0.243 264.376);
@@ -128,5 +135,71 @@
   }
   html {
     @apply font-sans;
+  }
+}
+/* Scrollbar (from Barista): a neutral grey pill on a clear track. The 2px
+   transparent border insets the pill from the edge of the track. */
+@layer base {
+  @supports selector(::-webkit-scrollbar) {
+    ::-webkit-scrollbar {
+      width: 10px;
+      height: 10px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgb(0 0 0 / 0.28);
+      background-clip: padding-box;
+      border-radius: 99px;
+      border: 2px solid transparent;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background-color: rgb(0 0 0 / 0.45);
+    }
+    .dark ::-webkit-scrollbar-thumb {
+      background-color: rgb(255 255 255 / 0.22);
+    }
+  }
+  /* Firefox has no ::-webkit-scrollbar; this is its equivalent */
+  @supports not selector(::-webkit-scrollbar) {
+    html {
+      scrollbar-color: rgb(0 0 0 / 0.28) transparent;
+    }
+  }
+}
+
+/* A list that scrolls inside a card or panel: a thin grey pill on a clear track,
+   no arrow buttons, in light and dark. */
+.scrollbar-pill {
+  scrollbar-width: thin;
+  scrollbar-color: #71717a transparent;
+}
+@supports selector(::-webkit-scrollbar) {
+  .scrollbar-pill {
+    scrollbar-width: auto;
+    scrollbar-color: auto;
+  }
+  .scrollbar-pill::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  .scrollbar-pill::-webkit-scrollbar-track,
+  .scrollbar-pill::-webkit-scrollbar-corner {
+    background: transparent;
+  }
+  .scrollbar-pill::-webkit-scrollbar-thumb {
+    background: #a1a1aa;
+    border: 0;
+    border-radius: 100px;
+  }
+  .dark .scrollbar-pill::-webkit-scrollbar-thumb {
+    background: #52525b;
+  }
+  .scrollbar-pill::-webkit-scrollbar-thumb:hover {
+    background: #71717a;
+  }
+  .scrollbar-pill::-webkit-scrollbar-button {
+    display: none;
   }
 }

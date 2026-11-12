@@ -24,7 +24,7 @@ export default async function ComingSoonPage({ params }) {
   const name = titleCase(slug[slug.length - 1]);
 
   return (
-    <div className="flex h-full flex-1 flex-col items-center justify-center gap-3 p-10 text-center">
+    <div className="flex min-h-[70vh] flex-1 flex-col items-center justify-center gap-3 p-10 text-center">
       <div className="flex size-12 items-center justify-center rounded-full bg-black text-white">
         <Hammer className="size-5" />
       </div>

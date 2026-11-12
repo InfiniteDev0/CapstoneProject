@@ -43,11 +43,13 @@ export function NavUser({ user }) {
           <DropdownMenuTrigger asChild>
             <SidebarMenuButton
               size="lg"
-              className="bg-black text-white hover:bg-zinc-800 cursor-pointer hover:text-white"
+              tooltip={user.name}
+              className="cursor-pointer bg-black text-white hover:bg-zinc-800 hover:text-white data-[state=open]:bg-zinc-800 data-[state=open]:text-white"
             >
-              <Avatar className="h-8 w-8 rounded-lg">
-                <AvatarImage src={user.avatar} alt={user.name} />
-                <AvatarFallback className="rounded-lg">VN</AvatarFallback>
+              {/* Square tile, no ring: open it sits inside the black card, folded it IS the card */}
+              <Avatar className="size-8 rounded-md after:hidden">
+                <AvatarImage src={user.avatar} alt={user.name} className="rounded-md" />
+                <AvatarFallback className="rounded-md bg-white/15 text-xs font-medium text-white">VN</AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-medium">{user.name}</span>
@@ -64,9 +66,9 @@ export function NavUser({ user }) {
           >
             <DropdownMenuLabel className="p-0 font-normal">
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-                <Avatar className="h-8 w-8 rounded-lg">
-                  <AvatarImage src={user.avatar} alt={user.name} />
-                  <AvatarFallback className="rounded-lg">VN</AvatarFallback>
+                <Avatar className="size-8 rounded-md after:hidden">
+                  <AvatarImage src={user.avatar} alt={user.name} className="rounded-md" />
+                  <AvatarFallback className="rounded-md bg-black text-xs font-medium text-white">VN</AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-medium">{user.name}</span>
