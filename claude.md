@@ -113,8 +113,8 @@ CapstoneProject/
 ## Current status
 - [x] Phase 1 — The building (done 2026-11-10)
 - [x] Phase 2 — The storage (done 2026-11-12)
-- [ ] Phase 3 — The kitchen  ← **we are here**
-- [ ] Phase 4 — The wiring
+- [x] Phase 3 — The kitchen (done 2026-11-12)
+- [ ] Phase 4 — The wiring  ← **we are here**
 - [ ] Phase 5 — Practice guests
 - [ ] Phase 6 — The smart waiter
 - [ ] Phase 7 — Waiter meets kitchen
@@ -128,7 +128,7 @@ Update this checklist at the end of each phase.
 - **If a new page looks unstyled in dev**, restart `pnpm dev` (OneDrive can hide new files from Tailwind's watcher).
 - **pnpm 11** uses `allowBuilds:` in `pnpm-workspace.yaml` (not `ignoredBuiltDependencies`).
 - **Toasts:** always `import { notify } from "@/lib/toast"`. One `<Toaster />` lives in each root layout. Don't import `sonner` directly in pages.
-- **Login placeholders (Phase 3 replaces them):** shop `Navbar.jsx` has `isAuthenticated = false`; shop `components/forms/login-form.jsx` uses a `previewAuth` stub; admin `login-form.jsx` and `nav-user.jsx` fake the login/logout; `apps/admin/src/app/dashboard/layout.js` needs the JWT guard.
+- **Login placeholders (Phase 4 wires them to the Java JWT):** shop `Navbar.jsx` has `isAuthenticated = false`; shop `components/forms/login-form.jsx` uses a `previewAuth` stub; admin `login-form.jsx` and `nav-user.jsx` fake the login/logout; `apps/admin/src/app/dashboard/layout.js` needs the JWT guard.
 - **Copy the inventory faithfully.** Shop Navbar, Banner, Footer layout and login page are the originals (Navbar floats over the Hero, Banner stays pinned). Don't "improve" layouts without asking Yussuf first.
 - **Unbuilt pages** show a branded "coming soon" page: shop `app/not-found.js`, admin `app/dashboard/[...slug]/page.jsx`. Delete an entry from `comingIn` when its page is built.
 - **Left in the inventory for later:** shop `text-animate.jsx`, home sections (Collection, models, services, shortcuts), admin `media-uploader.jsx` (Cloudinary) and `product-table.jsx` (all Phase 4).
@@ -141,6 +141,16 @@ Update this checklist at the end of each phase.
   - Product `_id`s are fixed (`6750a1000000000000000` + 3-digit code: 1xx Seasonal, 4xx Modern Muse, 6xx Traditions, 7xx Simplicity). MySQL stores them as `product_id CHAR(24)`. There's no foreign key across the two databases, so **Java must check** that a product and SKU exist and are in stock before cart and order writes.
   - Money: MySQL `DECIMAL(10,2)`, Mongo `Decimal128`. In Java use `BigDecimal`, never `double`.
   - Seed users: 1 admin, 2 Amira, 3 Layla (BCrypt `$2a$10$`, which Spring Security's `BCryptPasswordEncoder` accepts). The demo passwords are in `database/README.md`.
+- **API (Phase 3):** `apps/api`, Spring Boot 4.1 on **JDK 17** (Yussuf chose 17; it meets "Java 17+"). Every endpoint is listed in `apps/api/README.md`; Swagger is at http://localhost:8080/swagger-ui.html.
+  - Run it with `pnpm dev:api` (it runs `.\mvnw.cmd spring-boot:run`) and test with `cd apps/api; .\mvnw.cmd test`. It reads the root `.env` (MySQL, MongoDB, `JWT_SECRET`) through `spring.config.import`.
+  - Spring Boot 4 notes: the MongoDB properties are `spring.mongodb.*`; MockMvc lives in `org.springframework.boot.webmvc.test.autoconfigure`; springdoc is 3.x; jjwt is 0.13.
+  - Auth: `POST /api/auth/login` returns `{ token, user }`. The frontends send `Authorization: Bearer <token>`, plus optionally `X-Device-Id` (a stable browser id) and `X-Session-Id` (the visit id, which ties clickstream events together). CORS allows 3000 and 3001.
+  - Errors are always `{ error, message, status }`, so the frontends can show `message` with `notify.apiError`.
+  - Don't put `@Validated` on controllers: it turns URL validation errors into 500s (Spring MVC validates `@Pattern`/`@Min` on parameters by itself).
+  - The checkout pattern: take stock in MongoDB (atomic `$inc` with an "enough left" condition), write MySQL in `OrderWriter` (`@Transactional`), and give stock back if MySQL fails. Admin cancel/refund returns stock after the commit.
+  - The tests (`ApiFlowTests`) use the real local databases and clean up after themselves. When a dev server is already on 8080, start a second copy with `--server.port=8090`.
+  - Phase 7 placeholders: `GET /api/admin/churn`, `/retention-offers` and `/model-metrics` return `[]`; `DashboardStats.churnRate` and `CustomerRow.churnRisk` are null. Checkout can already redeem a `retention_offers` code.
+- **Admin UI (Barista-style shell):** `components/admin-shell.jsx` (frame), `admin-topbar.jsx` (logo, Ctrl K search, theme toggle, bell), `app-sidebar.jsx` (floating, collapsible card), `stat-card.jsx`, `notifications/` (@beui/alert cards, swipe gestures, AnimatedList). The menu lives in `lib/admin-nav.js`. Yussuf's taste: **no borders**, small but not tiny rounding (`rounded-lg`), no breadcrumb, no create button, and scrollbars use `.scrollbar-pill`.
 
 ## Rules
 - Never commit `.env` files, secrets, `node_modules`, `.next`, `target/`, `.venv` or large data files.
