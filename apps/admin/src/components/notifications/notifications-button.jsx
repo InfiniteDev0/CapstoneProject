@@ -142,6 +142,10 @@ export function NotificationsButton({ className, shortcut = false }) {
 
       <SheetContent
         showCloseButton={false}
+        // A tap on a toast (its Undo) is not a "click outside": keep the panel open
+        onInteractOutside={(event) => {
+          if (event.target?.closest?.("[data-sonner-toaster]")) event.preventDefault();
+        }}
         className={cn(
           // A pale sage panel that floats off the screen's edge, a little wider than a standard sheet
           "gap-0 border-0 bg-[#e8ede8] p-0 dark:bg-neutral-950",
