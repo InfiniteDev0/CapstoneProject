@@ -114,8 +114,8 @@ CapstoneProject/
 - [x] Phase 1 — The building (done 2026-11-10)
 - [x] Phase 2 — The storage (done 2026-11-12)
 - [x] Phase 3 — The kitchen (done 2026-11-12)
-- [ ] Phase 4 — The wiring  ← **we are here**
-- [ ] Phase 5 — Practice guests
+- [x] Phase 4 — The wiring (done 2026-11-12)
+- [ ] Phase 5 — Practice guests  ← **we are here**
 - [ ] Phase 6 — The smart waiter
 - [ ] Phase 7 — Waiter meets kitchen
 - [ ] Phase 8 — Opening night
@@ -128,9 +128,12 @@ Update this checklist at the end of each phase.
 - **If a new page looks unstyled in dev**, restart `pnpm dev` (OneDrive can hide new files from Tailwind's watcher).
 - **pnpm 11** uses `allowBuilds:` in `pnpm-workspace.yaml` (not `ignoredBuiltDependencies`).
 - **Toasts:** always `import { notify } from "@/lib/toast"`. One `<Toaster />` lives in each root layout. Don't import `sonner` directly in pages.
-- **Login placeholders (Phase 4 wires them to the Java JWT):** shop `Navbar.jsx` has `isAuthenticated = false`; shop `components/forms/login-form.jsx` uses a `previewAuth` stub; admin `login-form.jsx` and `nav-user.jsx` fake the login/logout; `apps/admin/src/app/dashboard/layout.js` needs the JWT guard.
+- **Auth in the websites (Phase 4):** shop token in cookie `vn_token`, admin token in `vn_admin_token` (cookies on localhost are shared across ports, so the names must differ). Each app has `src/proxy.js` (Next 16 middleware) guarding private routes on the server: shop `/account`, `/checkout`; admin `/dashboard/**` (role ADMIN). A normal (not httpOnly) cookie because Java returns the token as JSON. For the report: httpOnly set by the server would be safer.
 - **Copy the inventory faithfully.** Shop Navbar, Banner, Footer layout and login page are the originals (Navbar floats over the Hero, Banner stays pinned). Don't "improve" layouts without asking Yussuf first.
-- **Unbuilt pages** show a branded "coming soon" page: shop `app/not-found.js`, admin `app/dashboard/[...slug]/page.jsx`. Delete an entry from `comingIn` when its page is built.
+- **Websites talk to Java through ONE client per app:** `src/lib/api.js` (base URL from `NEXT_PUBLIC_API_URL`, JWT, device/session ids, error toast from `{ message }`, 401 → login). Pages load data with `hooks/use-api.js` and always show a skeleton, an empty state and an error state. Both apps read `NEXT_PUBLIC_*` from the root `.env` (via `next.config.mjs`).
+- **Clickstream from the shop:** `src/lib/track.js` sends only VIEW (product page) and SEARCH (search box), fire-and-forget. Java logs ADD_TO_CART, REMOVE_FROM_CART, WISHLIST and PURCHASE itself. The browser sends `X-Session-Id` (per visit) and `X-Device-Id` (per browser).
+- **Phase 7 slots already wired:** shop `components/shop/RecommendedForYou.jsx` (hidden while empty; on home and product pages) and `components/product/SimilarItems.jsx` (same collection for now); admin `/dashboard/churn` and `/dashboard/models` call their endpoints and show "Activates in Phase 7"; the dashboard churn card and customer churn column show placeholders.
+- **Testing tip:** to test against a copy of the API without touching Yussuf's servers, run the jar with `--server.port=8090 --app.cors.allowed-origins=http://localhost:3101,http://localhost:3102`, build the app with `NEXT_PUBLIC_API_URL=http://localhost:8090`, and serve it with `next start -p 3101/3102`. Rebuild without the variable afterwards.
 - **Left in the inventory for later:** shop `text-animate.jsx`, home sections (Collection, models, services, shortcuts), admin `media-uploader.jsx` (Cloudinary) and `product-table.jsx` (all Phase 4).
 - **Footer contact details** are placeholders (`href="#"`). Yussuf to supply the real ones.
 - **Python is not installed yet** (only the Microsoft Store alias). Install Python 3.12 before Phase 6.
