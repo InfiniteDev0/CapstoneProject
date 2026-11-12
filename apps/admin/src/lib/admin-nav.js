@@ -70,20 +70,6 @@ function formatSegment(segment) {
     .join(" ");
 }
 
-/**
- * The trail to the page you're on, after "Vela Noire" (which already links to the dashboard):
- * /dashboard → [Dashboard];  /dashboard/products/inventory → [Products, Inventory].
- */
-export function breadcrumbs(pathname) {
-  const parts = pathname.split("/").filter(Boolean); // ["dashboard", "products", "inventory"]
-  const trail = parts.map((part, i) => {
-    const url = "/" + parts.slice(0, i + 1).join("/");
-    const page = navMain.find((item) => item.url === url) ?? allPages.find((p) => p.url === url);
-    return { url, title: page?.title ?? formatSegment(part) };
-  });
-  return trail.length > 1 ? trail.slice(1) : trail;
-}
-
 /** The name of the page you're on, for the top bar and the tab title. */
 export function pageTitle(pathname) {
   const exact = allPages.find((page) => page.url === pathname);

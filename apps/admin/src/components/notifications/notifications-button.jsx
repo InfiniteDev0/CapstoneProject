@@ -13,6 +13,9 @@ import {
 } from "@/components/ui/sheet";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useKeyShortcut } from "@/hooks/use-key-shortcut";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { AnimatedList } from "@/components/motion/animated-list";
+import { SwipeNotification, SwipeReveal } from "./swipe";
 import { adminUser } from "@/lib/admin-nav";
 import { notify } from "@/lib/toast";
 import { cn } from "@/lib/utils";
@@ -53,6 +56,9 @@ export function NotificationsButton({ className, shortcut = false }) {
   const router = useRouter();
   const { read, cleared } = useNotificationState();
   const [open, setOpen] = useState(false);
+  // Computers: the one card slid open to show its Clear or Open button
+  const [revealed, setRevealed] = useState(null);
+  const isMobile = useIsMobile();
   useKeyShortcut("n", () => setOpen((o) => !o), { enabled: shortcut });
 
   const today = todayIso();
@@ -79,6 +85,7 @@ export function NotificationsButton({ className, shortcut = false }) {
   const clear = (list) => {
     const ids = list.map(({ id }) => id);
     notificationStore.clear(ids);
+    setRevealed(null);
     notify.success(list.length === 1 ? `"${list[0].title}" cleared` : `${list.length} notifications cleared`, {
       action: { label: "Undo", onClick: () => notificationStore.restore(ids) },
     });
@@ -87,12 +94,28 @@ export function NotificationsButton({ className, shortcut = false }) {
   /** It counts as read, the sheet gets out of the way, then its page opens. */
   const openNotification = (n) => {
     notificationStore.markRead([n.id]);
+    setRevealed(null);
     setOpen(false);
     window.setTimeout(() => router.push(n.href), SHEET_CLOSE_MS);
   };
 
+  const card = (n) => (
+    <NotificationCard
+      notification={n}
+      read={read.has(n.id)}
+      today={today}
+      onOpen={() => openNotification(n)}
+    />
+  );
+
   return (
-    <Sheet open={open} onOpenChange={setOpen}>
+    <Sheet
+      open={open}
+      onOpenChange={(next) => {
+        setOpen(next);
+        if (!next) setRevealed(null);
+      }}
+    >
       <Tooltip>
         <TooltipTrigger asChild>
           <SheetTrigger asChild>
@@ -161,26 +184,39 @@ export function NotificationsButton({ className, shortcut = false }) {
         </div>
 
         {shown.length > 0 ? (
-          <ul aria-label="Notifications" className="scrollbar-pill min-h-0 flex-1 overflow-y-auto px-4 pt-2 pb-8">
-            {shown.map((n, i) => (
-              <li
-                key={n.id}
-                className="mb-5 animate-in fade-in-0 slide-in-from-bottom-2 fill-mode-both last:mb-0"
-                style={{ animationDelay: `${i * 40}ms` }}
-              >
+          <AnimatedList
+            aria-label="Notifications"
+            items={shown}
+            getKey={(n) => n.id}
+            onItemSelect={openNotification}
+            onItemRemove={(n) => clear([n])}
+            gradientClassName="from-[#e8ede8] dark:from-neutral-950"
+            className="min-h-0 flex-1"
+            listClassName="px-4 pt-2 pb-8"
+            itemClassName="mb-5 last:mb-0"
+            renderItem={(n) => (
+              <>
                 {headings.has(n.id) ? (
                   <h3 className="mb-2 px-1 text-sm font-semibold text-muted-foreground">{headings.get(n.id)}</h3>
                 ) : null}
-                <NotificationCard
-                  notification={n}
-                  read={read.has(n.id)}
-                  today={today}
-                  onOpen={() => openNotification(n)}
-                  onClear={() => clear([n])}
-                />
-              </li>
-            ))}
-          </ul>
+                {/* Phones: swipe right to clear, left to open. Computers: drag to show Clear or Open. */}
+                {isMobile ? (
+                  <SwipeNotification onClear={() => clear([n])} onOpen={() => openNotification(n)}>
+                    {card(n)}
+                  </SwipeNotification>
+                ) : (
+                  <SwipeReveal
+                    revealed={revealed?.id === n.id ? revealed.side : null}
+                    onRevealChange={(side) => setRevealed(side ? { id: n.id, side } : null)}
+                    onClear={() => clear([n])}
+                    onOpen={() => openNotification(n)}
+                  >
+                    {card(n)}
+                  </SwipeReveal>
+                )}
+              </>
+            )}
+          />
         ) : (
           <div className="flex flex-1 flex-col items-center justify-center gap-2 px-6 py-16 text-center">
             <span className="flex size-12 items-center justify-center rounded-full bg-card">
