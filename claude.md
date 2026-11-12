@@ -112,8 +112,8 @@ CapstoneProject/
 
 ## Current status
 - [x] Phase 1 — The building (done 2026-11-10)
-- [ ] Phase 2 — The storage  ← **we are here**
-- [ ] Phase 3 — The kitchen
+- [x] Phase 2 — The storage (done 2026-11-12)
+- [ ] Phase 3 — The kitchen  ← **we are here**
 - [ ] Phase 4 — The wiring
 - [ ] Phase 5 — Practice guests
 - [ ] Phase 6 — The smart waiter
@@ -135,6 +135,12 @@ Update this checklist at the end of each phase.
 - **Footer contact details** are placeholders (`href="#"`). Yussuf to supply the real ones.
 - **Python is not installed yet** (only the Microsoft Store alias). Install Python 3.12 before Phase 6.
 - Brand photos live in `apps/shop/public/assets/images/*.webp` (converted from the inventory PNGs).
+- **Databases (Phase 2):** how to install, create, seed and reset is in `database/README.md`; the ER diagram is in `docs/diagrams/er-diagram.md`.
+  - MySQL 9.3 runs as service `MySQL93` on port 3306. `mysql.exe` is **not on PATH**: it's at `C:\Program Files\MySQL\MySQL Server 9.3\bin`. The app connects as `vela_app` (password in `.env`), never as root. `database\mysql\reset.ps1` rebuilds the tables and seed.
+  - MongoDB 8.3 runs as service `MongoDB` on 27017. mongosh is at `%LOCALAPPDATA%\Programs\mongosh\mongosh.exe`. In PowerShell, run mongosh queries with `--file script.js`, not `--eval` (PowerShell strips the quotes).
+  - Product `_id`s are fixed (`6750a1000000000000000` + 3-digit code: 1xx Seasonal, 4xx Modern Muse, 6xx Traditions, 7xx Simplicity). MySQL stores them as `product_id CHAR(24)`. There's no foreign key across the two databases, so **Java must check** that a product and SKU exist and are in stock before cart and order writes.
+  - Money: MySQL `DECIMAL(10,2)`, Mongo `Decimal128`. In Java use `BigDecimal`, never `double`.
+  - Seed users: 1 admin, 2 Amira, 3 Layla (BCrypt `$2a$10$`, which Spring Security's `BCryptPasswordEncoder` accepts). The demo passwords are in `database/README.md`.
 
 ## Rules
 - Never commit `.env` files, secrets, `node_modules`, `.next`, `target/`, `.venv` or large data files.
