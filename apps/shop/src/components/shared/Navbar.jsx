@@ -9,10 +9,14 @@ import {
   Sparkles,
   Layers,
   Watch,
+  LogOut,
 } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
+import { useAuth } from "@/components/providers/AuthProvider";
+import { notify } from "@/lib/toast";
 
 
 export default function Navbar() {
@@ -31,14 +35,21 @@ export default function Navbar() {
     document.addEventListener("pointerdown", handleClickOutside);
     return () => document.removeEventListener("pointerdown", handleClickOutside);
   }, [MenuState]);
-  // Phase 3 wires this to the Java JWT login. Until then everyone is a guest.
-  const isAuthenticated = false;
-  const loading = false;
+  // Who is shopping, from the Java JWT login (AuthProvider)
+  const { user, isAuthenticated, loading, logout } = useAuth();
+  const router = useRouter();
+
+  const signOut = () => {
+    setMenuState(false);
+    logout();
+    notify.success("Signed out");
+    router.push("/");
+  };
 
   const menuItems = [
-    { label: "New & featured", path: "/new", icon: Sparkles },
-    { label: "Our Collections", path: "/men", icon: Layers },
-    { label: "Accessories", path: "/collections", icon: Watch },
+    { label: "New & featured", path: "/shop?sort=newest", icon: Sparkles },
+    { label: "Our Collections", path: "/shop", icon: Layers },
+    { label: "Accessories", path: "/shop?category=accessory", icon: Watch },
   ];
 
   return (
@@ -68,22 +79,29 @@ export default function Navbar() {
           <p className="text-xs underline font-semibold tracking-wide">
             Help now?
           </p>
-          <Link href={"/"}>
+          <Link href={isAuthenticated ? "/account/wishlist" : "/login?redirect=/account/wishlist"} aria-label="Wishlist">
             <Heart className="w-4 h-4" />
           </Link>
 
           {/* User icon — switches based on auth state */}
           {!loading && (
-            <Link href={isAuthenticated ? "/MyVn" : "/login"}>
+            <Link
+              href={isAuthenticated ? "/account" : "/login"}
+              aria-label={isAuthenticated ? "My account" : "Sign in"}
+              className="flex items-center gap-1.5"
+            >
               {isAuthenticated ? (
-                <UserRoundCheck className="w-4 h-4" />
+                <>
+                  <UserRoundCheck className="w-4 h-4" />
+                  <span className="hidden text-xs sm:inline">{user.name.split(" ")[0]}</span>
+                </>
               ) : (
                 <User2 className="w-4 h-4" />
               )}
             </Link>
           )}
 
-          <Link href={"/"}>
+          <Link href={"/cart"} aria-label="Shopping bag">
             <HandbagIcon className="w-4 h-4" />
           </Link>
         </div>
@@ -114,6 +132,19 @@ export default function Navbar() {
                   </Link>
                 </li>
               ))}
+              {isAuthenticated ? (
+                <li className="relative group list-none">
+                  <button
+                    type="button"
+                    onClick={signOut}
+                    className="!px-2 rounded-md transition-all duration-300 flex w-full items-center justify-between !py-2 text-sm tracking-wider
+                    bg-zinc-100 hover:bg-black hover:text-white"
+                  >
+                    Sign out
+                    <LogOut className="size-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  </button>
+                </li>
+              ) : null}
             </ul>
           </motion.div>
         )}

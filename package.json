@@ -3,11 +3,15 @@
   "private": true,
   "description": "Vela Noire: E-Commerce Intelligent Analytics & Personalization Suite",
   "scripts": {
-    "dev": "pnpm --filter shop --filter admin --parallel dev",
+    "dev": "concurrently -k -n api,shop,admin -c yellow,magenta,cyan \"pnpm dev:api\" \"pnpm dev:shop\" \"pnpm dev:admin\"",
     "dev:shop": "pnpm --filter shop dev",
     "dev:admin": "pnpm --filter admin dev",
     "dev:api": "cd apps/api && .\\mvnw.cmd spring-boot:run",
     "build:shop": "pnpm --filter shop build",
-    "build:admin": "pnpm --filter admin build"
+    "build:admin": "pnpm --filter admin build",
+    "dev:web": "pnpm --filter shop --filter admin --parallel dev"
+  },
+  "devDependencies": {
+    "concurrently": "^10.0.7"
   }
 }

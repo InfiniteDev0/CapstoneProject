@@ -1,19 +1,24 @@
 import Link from "next/link";
 
-export const metadata = { title: "Coming soon" };
+export const metadata = { title: "Page not found" };
 
-// Shown for any page we have not built yet (product, cart, collections…).
+// A real 404: the address doesn't match any page or product.
 export default function NotFound() {
   return (
     <section className="flex min-h-[80vh] flex-col items-center justify-center gap-4 px-6 pt-24 text-center">
       <p className="text-xs uppercase tracking-[0.3em] text-zinc-500">Vela Noire</p>
-      <h1 className="text-3xl">This page is being crafted</h1>
+      <h1 className="text-3xl">We couldn&apos;t find that page</h1>
       <p className="max-w-md text-sm text-zinc-600">
-        Like every Vela Noire piece, it takes time to get right. Please come back soon.
+        The piece or page you&apos;re looking for may have moved or is no longer available.
       </p>
-      <Link href="/" className="mt-2 underline transition-colors duration-300 hover:text-gray-500">
-        Return to the home page
-      </Link>
+      <div className="mt-2 flex gap-6">
+        <Link href="/shop" className="underline transition-colors duration-300 hover:text-gray-500">
+          Browse the collections
+        </Link>
+        <Link href="/" className="underline transition-colors duration-300 hover:text-gray-500">
+          Home
+        </Link>
+      </div>
     </section>
   );
 }

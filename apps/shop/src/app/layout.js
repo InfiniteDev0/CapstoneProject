@@ -4,6 +4,7 @@ import "@fontsource/birthstone";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 import SiteChrome from "@/components/shared/SiteChrome";
+import { AuthProvider } from "@/components/providers/AuthProvider";
 
 export const metadata = {
   title: {
@@ -18,7 +19,9 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body className="font-sans antialiased">
-        <SiteChrome>{children}</SiteChrome>
+        <AuthProvider>
+          <SiteChrome>{children}</SiteChrome>
+        </AuthProvider>
         <Toaster />
       </body>
     </html>
