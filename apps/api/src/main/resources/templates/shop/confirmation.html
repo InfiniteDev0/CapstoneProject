@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head><th:block th:replace="~{fragments/layout :: head('Order confirmed')}"></th:block></head>
+<body class="scrollbar-pill">
+<header th:replace="~{fragments/shop :: header}"></header>
+
+<main class="mx-auto max-w-3xl px-4 pt-14 text-center md:px-6">
+  <div class="mx-auto grid size-16 place-items-center rounded-full bg-emerald-50 text-emerald-600">
+    <svg th:replace="~{fragments/icons :: icon('check', 'size-8')}"></svg>
+  </div>
+  <h1 class="display mt-5 text-5xl md:text-6xl">Your order is confirmed</h1>
+  <p class="mt-3 text-ash">Thank you! Order <span class="font-semibold text-ink" th:text="${order.orderNumber}">LS-2026-000006</span> is paid and being prepared.</p>
+
+  <div class="mt-10 rounded-md bg-mist p-6 text-left">
+    <ul class="flex flex-col gap-3 text-sm">
+      <li th:each="i : ${order.items}" class="flex justify-between gap-3">
+        <span><span class="font-medium" th:text="${i.productName}">Stratus Runner</span>
+          <span class="block text-xs text-ash" th:text="|${i.colorName}${i.selectedSize != 'ONE_SIZE' ? ' · Size ' + i.selectedSize : ''} · × ${i.quantity}|">Onyx · Size 9 · × 1</span></span>
+        <span th:text="${@fmt.money(i.lineTotal)}">$420.00</span>
+      </li>
+    </ul>
+    <dl class="mt-5 flex flex-col gap-2 pt-4 text-sm">
+      <div class="flex justify-between"><dt class="text-ash">Shipping</dt><dd th:text="${order.shippingFee.signum() == 0} ? 'Free' : ${@fmt.money(order.shippingFee)}">Free</dd></div>
+      <div th:if="${order.discountAmount.signum() > 0}" class="flex justify-between"><dt class="text-ash">Discount</dt><dd th:text="|−${@fmt.money(order.discountAmount)}|">−$10.00</dd></div>
+      <div class="flex justify-between text-base font-semibold"><dt>Total paid</dt><dd th:text="${@fmt.money(order.total)}">$605.00</dd></div>
+    </dl>
+    <p class="mt-5 text-xs text-ash" th:text="|Shipping to ${order.shippingName}, ${order.shippingAddress}, ${order.shippingCity}, ${order.shippingCountry}|">Shipping to…</p>
+  </div>
+
+  <div class="mt-8 flex flex-wrap justify-center gap-3">
+    <a th:href="@{/account/orders/{id}(id=${order.id})}" class="btn btn-dark">View order</a>
+    <a th:href="@{/categories/new}" class="btn btn-light">Continue shopping</a>
+  </div>
+</main>
+
+<footer th:replace="~{fragments/shop :: footer}"></footer>
+<th:block th:replace="~{fragments/layout :: feedback}"></th:block>
+<script th:src="@{/js/shop.js}"></script>
+</body>
+</html>

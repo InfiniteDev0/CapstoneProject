@@ -1,5 +1,5 @@
 -- =============================================================================
---  Vela Noire: MySQL schema (the "receipt book")
+--  LuxuryShop: MySQL schema (the "receipt book")
 -- =============================================================================
 --  MySQL holds the strict, money-and-people data: accounts, carts, orders,
 --  payments, and the churn/AI results the admin portal reads.
@@ -9,7 +9,7 @@
 --  24 hex characters. MySQL cannot check them (no foreign key can cross two
 --  databases), so the Java API checks that the product exists before saving.
 --
---  Run:  mysql -u vela_app -p vela_noire < database/mysql/schema.sql
+--  Run:  mysql -u luxury_app -p luxuryshop < database/mysql/schema.sql
 --  ⚠ Running this file RESETS the database: it drops and recreates every table.
 -- =============================================================================
 
@@ -35,7 +35,7 @@ CREATE TABLE users (
   city                 VARCHAR(80)      NULL,
   gender               ENUM('FEMALE','MALE','OTHER','PREFER_NOT_TO_SAY') NULL,
   date_of_birth        DATE             NULL,
-  preferred_categories JSON             NULL COMMENT 'Category slugs, e.g. ["abaya","perfume"]',
+  preferred_categories JSON             NULL COMMENT 'Category slugs, e.g. ["men","shoes"]',
   is_active            BOOLEAN          NOT NULL DEFAULT TRUE,
   created_at           DATETIME(3)      NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
   updated_at           DATETIME(3)      NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
@@ -86,7 +86,7 @@ CREATE TABLE wishlist_items (
 -- -----------------------------------------------------------------------------
 -- cart_items: what is in each customer's shopping bag right now.
 -- One row per colour (sku) and size; adding the same again raises quantity.
--- Abaya options (size, front style, shayla) are chosen at add-to-cart time.
+-- The size (S, M, 10...) is chosen at add-to-cart time; one-size items store ONE_SIZE.
 -- -----------------------------------------------------------------------------
 CREATE TABLE cart_items (
   id                       BIGINT UNSIGNED  NOT NULL AUTO_INCREMENT,
@@ -95,9 +95,6 @@ CREATE TABLE cart_items (
   sku                      VARCHAR(40)      NOT NULL COMMENT 'MongoDB products.variants.sku (the colour)',
   quantity                 INT UNSIGNED     NOT NULL DEFAULT 1,
   selected_size            VARCHAR(10)      NOT NULL DEFAULT 'ONE_SIZE',
-  selected_style           ENUM('OPEN_FRONT','CLOSED_FRONT','HALF_CLOSED','COMPLETELY_CLOSED') NULL,
-  shayla_type              ENUM('STANDARD','CUSTOM','NONE') NULL,
-  custom_measurements_url  VARCHAR(500)     NULL,
   comments                 VARCHAR(500)     NULL,
   created_at               DATETIME(3)      NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
   updated_at               DATETIME(3)      NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
@@ -200,16 +197,13 @@ CREATE TABLE order_items (
   product_id               CHAR(24)         NOT NULL COMMENT 'MongoDB products._id',
   sku                      VARCHAR(40)      NOT NULL COMMENT 'MongoDB products.variants.sku',
   product_name             VARCHAR(200)     NOT NULL,
-  category                 VARCHAR(40)      NOT NULL COMMENT 'Category slug, e.g. abaya',
-  collection               VARCHAR(80)      NULL,
+  category                 VARCHAR(40)      NOT NULL COMMENT 'men | women | shoes',
+  sub_category             VARCHAR(40)      NULL COMMENT 'e.g. outerwear, running',
   color_name               VARCHAR(60)      NULL,
   unit_price               DECIMAL(10,2)    NOT NULL,
   quantity                 INT UNSIGNED     NOT NULL,
   line_total               DECIMAL(10,2)    AS (unit_price * quantity) STORED,
   selected_size            VARCHAR(10)      NOT NULL DEFAULT 'ONE_SIZE',
-  selected_style           ENUM('OPEN_FRONT','CLOSED_FRONT','HALF_CLOSED','COMPLETELY_CLOSED') NULL,
-  shayla_type              ENUM('STANDARD','CUSTOM','NONE') NULL,
-  custom_measurements_url  VARCHAR(500)     NULL,
   comments                 VARCHAR(500)     NULL,
   PRIMARY KEY (id),
   KEY ix_items_order (order_id),

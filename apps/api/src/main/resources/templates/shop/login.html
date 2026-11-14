@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head><th:block th:replace="~{fragments/layout :: head('Log in')}"></th:block></head>
+<body class="scrollbar-pill">
+<header th:replace="~{fragments/shop :: header}"></header>
+
+<!--/* The Under-Armour login panel: title row, labelled fields, a black button with the logo */-->
+<main class="mx-auto max-w-md px-4 pt-14">
+  <div class="rounded-md bg-white p-2">
+    <h1 class="display text-5xl">Login</h1>
+    <p class="mt-1 text-sm text-ash">Welcome back. Log in to see your bag, favourites and orders.</p>
+
+    <div th:if="${error}" class="mt-6 flex items-start gap-3 rounded-md bg-rose-50 p-4 text-sm text-rose-800" role="alert">
+      <svg th:replace="~{fragments/icons :: icon('alert', 'size-5 shrink-0')}"></svg><span th:text="${error}">Invalid email or password</span>
+    </div>
+
+    <form th:action="@{/login}" method="post" class="mt-6 flex flex-col gap-5">
+      <div>
+        <label class="label" for="email">Email address *</label>
+        <input id="email" name="email" type="email" required autocomplete="email" placeholder="Email" class="field h-12" autofocus>
+      </div>
+      <div>
+        <label class="label" for="password">Password *</label>
+        <input id="password" name="password" type="password" required autocomplete="current-password" placeholder="Password" class="field h-12">
+      </div>
+      <button type="submit" class="btn btn-dark h-12 text-base">
+        <span th:replace="~{fragments/layout :: wordmark('text-lg')}"></span> Log in
+      </button>
+    </form>
+    <p class="mt-6 text-sm text-ash">New to LuxuryShop? <a th:href="@{/register}" class="font-semibold text-ink underline underline-offset-4 hover:text-crimson">Register</a></p>
+  </div>
+</main>
+
+<footer th:replace="~{fragments/shop :: footer}"></footer>
+<th:block th:replace="~{fragments/layout :: feedback}"></th:block>
+<script th:src="@{/js/shop.js}"></script>
+</body>
+</html>

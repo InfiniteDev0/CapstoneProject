@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head><th:block th:replace="~{fragments/layout :: head('Liked items')}"></th:block></head>
+<body class="scrollbar-pill">
+<header th:replace="~{fragments/shop :: header}"></header>
+
+<main class="mx-auto max-w-5xl px-4 pt-10 md:px-6">
+  <h1 class="display text-5xl md:text-6xl">Your <span class="text-crimson">LuxuryShop</span> favourites</h1>
+
+  <th:block th:if="${items.isEmpty()}">
+    <div th:replace="~{fragments/shop :: empty('heart', 'No favourites yet', 'Tap the heart on any piece to save it here for later.')}"></div>
+    <div class="flex justify-center"><a th:href="@{/categories/new}" class="btn btn-dark">Discover new arrivals</a></div>
+  </th:block>
+
+  <ul th:unless="${items.isEmpty()}" class="mt-8 flex flex-col gap-4">
+    <li th:each="w : ${items}" class="flex items-center gap-4 rounded-md bg-mist p-3 sm:gap-6 sm:p-4">
+      <th:block th:with="p=${w.product}">
+        <a th:if="${p != null}" th:href="@{/product/{s}(s=${p.slug})}" class="flex min-w-0 flex-1 items-center gap-4 sm:gap-6">
+          <div class="aspect-[3/4] w-20 shrink-0 overflow-hidden rounded bg-white sm:w-24">
+            <img th:if="${p.image != null}" th:src="${p.image}" th:alt="${p.name}" class="size-full object-cover">
+            <div th:if="${p.image == null}" class="photo-box size-full bg-white"><svg th:replace="~{fragments/icons :: icon('image', 'size-6')}"></svg></div>
+          </div>
+          <div class="min-w-0">
+            <h3 class="display truncate text-2xl" th:text="${p.name}">Women's Belted Wool Coat</h3>
+            <p class="text-sm text-ash" th:text="|${@fmt.label(p.category)} · ${@fmt.label(p.subCategory)}|">Women · Outerwear</p>
+            <p class="mt-1 font-semibold" th:text="${@fmt.price(p.finalPrice)}">$1,190</p>
+            <p th:if="${!p.inStock}" class="mt-1 text-xs font-semibold text-crimson">Sold out</p>
+          </div>
+        </a>
+        <p th:if="${p == null}" class="flex-1 text-sm text-ash">This piece is no longer available.</p>
+        <form th:action="@{/liked/{id}/remove(id=${w.productId})}" method="post">
+          <button class="btn btn-light btn-sm bg-white">Remove item</button>
+        </form>
+      </th:block>
+    </li>
+  </ul>
+</main>
+
+<footer th:replace="~{fragments/shop :: footer}"></footer>
+<th:block th:replace="~{fragments/layout :: feedback}"></th:block>
+<script th:src="@{/js/shop.js}"></script>
+</body>
+</html>

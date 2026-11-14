@@ -1,17 +1,19 @@
 {
-  "name": "vela-noire-capstone",
+  "name": "luxuryshop-capstone",
   "private": true,
-  "description": "Vela Noire: E-Commerce Intelligent Analytics & Personalization Suite",
+  "description": "LuxuryShop: E-Commerce Intelligent Analytics & Personalization Suite",
   "scripts": {
-    "dev": "concurrently -k -n api,shop,admin -c yellow,magenta,cyan \"pnpm dev:api\" \"pnpm dev:shop\" \"pnpm dev:admin\"",
-    "dev:shop": "pnpm --filter shop dev",
-    "dev:admin": "pnpm --filter admin dev",
-    "dev:api": "cd apps/api && .\\mvnw.cmd spring-boot:run",
-    "build:shop": "pnpm --filter shop build",
-    "build:admin": "pnpm --filter admin build",
-    "dev:web": "pnpm --filter shop --filter admin --parallel dev"
+    "dev": "concurrently -k -n css,api -c magenta,yellow \"pnpm css:watch\" \"pnpm dev:api\"",
+    "dev:api": "cd apps/api && .\\mvnw.cmd spring-boot:run -Dspring-boot.run.profiles=dev",
+    "css:build": "tailwindcss -i apps/api/styles/app.css -o apps/api/src/main/resources/static/css/app.css --minify",
+    "css:watch": "tailwindcss -i apps/api/styles/app.css -o apps/api/src/main/resources/static/css/app.css --watch",
+    "test:api": "cd apps/api && .\\mvnw.cmd test"
   },
   "devDependencies": {
-    "concurrently": "^10.0.7"
+    "@fontsource-variable/outfit": "^5.3.0",
+    "@fontsource/bebas-neue": "^5.3.0",
+    "@tailwindcss/cli": "^4.3.5",
+    "concurrently": "^10.0.7",
+    "tailwindcss": "^4.3.5"
   }
 }

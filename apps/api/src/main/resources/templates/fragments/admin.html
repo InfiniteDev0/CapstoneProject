@@ -1,0 +1,137 @@
+<!doctype html>
+<!--/*
+  The admin frame, the old Vela Noire layout rebuilt in Thymeleaf:
+  a full-width top bar (sidebar toggle, page title, search, bell) and, under it,
+  the sidebar (logo, menu, your account) next to the page. No borders.
+  A page uses it with:
+    <html th:replace="~{fragments/admin :: layout('Orders', ~{::#content}, ~{::#scripts})}">
+*/-->
+<html th:fragment="layout(title, content, scripts)" lang="en" xmlns:th="http://www.thymeleaf.org">
+<head><th:block th:replace="~{fragments/layout :: head(${title} + ' · Admin')}"></th:block></head>
+<body class="bg-white text-ink">
+
+<!--/* ---------- Top bar ---------- */-->
+<header class="sticky top-0 z-40 flex h-14 items-center gap-3 bg-white/95 px-3 backdrop-blur md:px-4">
+  <button type="button" data-sidebar-toggle class="grid size-9 place-items-center rounded-md text-ash hover:bg-neutral-100 hover:text-ink" aria-label="Toggle sidebar">
+    <svg th:replace="~{fragments/icons :: icon('panel', 'size-4.5')}"></svg>
+  </button>
+  <span class="h-4 w-px bg-neutral-200"></span>
+  <h1 class="truncate text-sm font-semibold" th:text="${title}">Dashboard</h1>
+
+  <div class="ml-auto flex items-center gap-2">
+    <form th:action="@{/admin/search}" method="get" role="search" class="relative hidden sm:block">
+      <svg th:replace="~{fragments/icons :: icon('search', 'pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-neutral-400')}"></svg>
+      <input name="q" type="search" th:value="${q}" placeholder="Search products, orders, customers…" aria-label="Search"
+             class="h-9 w-72 rounded-md bg-neutral-100 pl-9 pr-3 text-sm outline-none focus:bg-white focus:ring-2 focus:ring-ink/70">
+    </form>
+
+    <div class="relative" data-dropdown>
+      <button type="button" data-dropdown-toggle class="relative grid size-9 place-items-center rounded-md text-ash hover:bg-neutral-100 hover:text-ink" aria-label="Notifications">
+        <svg th:replace="~{fragments/icons :: icon('bell', 'size-4.5')}"></svg>
+        <span th:if="${bellCount > 0}" class="absolute right-1 top-1 grid min-w-4 place-items-center rounded-full bg-crimson px-1 text-[10px] font-bold leading-4 text-white" th:text="${bellCount > 9 ? '9+' : bellCount}">3</span>
+      </button>
+      <div data-dropdown-menu hidden class="scrollbar-pill absolute right-0 top-11 z-50 max-h-[70vh] w-80 overflow-y-auto rounded-lg bg-white p-2 shadow-xl">
+        <p class="px-2 pb-2 pt-1 text-xs font-semibold uppercase tracking-wide text-ash">Notifications</p>
+        <p th:if="${bellCount == 0}" class="px-2 py-6 text-center text-sm text-ash">All caught up.</p>
+        <a th:each="o : ${bellOrders}" th:href="@{/admin/orders/{id}(id=${o.id})}" class="flex gap-3 rounded-md p-2 hover:bg-neutral-100">
+          <span class="grid size-8 shrink-0 place-items-center rounded-md bg-sky-50 text-sky-700"><svg th:replace="~{fragments/icons :: icon('receipt', 'size-4')}"></svg></span>
+          <span class="min-w-0 text-sm"><span class="block font-medium" th:text="|New order ${o.orderNumber}|">New order</span>
+            <span class="block truncate text-xs text-ash" th:text="|${o.customerName} · ${@fmt.money(o.total)} · ${@fmt.ago(o.createdAt)}|">…</span></span>
+        </a>
+        <a th:each="r : ${bellLowStock}" th:href="@{/admin/inventory}" class="flex gap-3 rounded-md p-2 hover:bg-neutral-100">
+          <span class="grid size-8 shrink-0 place-items-center rounded-md bg-amber-50 text-amber-700"><svg th:replace="~{fragments/icons :: icon('boxes', 'size-4')}"></svg></span>
+          <span class="min-w-0 text-sm"><span class="block font-medium" th:text="${r.stock == 0} ? 'Sold out' : |Only ${r.stock} left|">Low stock</span>
+            <span class="block truncate text-xs text-ash" th:text="|${r.productName} · ${r.colorName}|">…</span></span>
+        </a>
+        <p th:if="${bellOrderCount > bellOrders.size() or bellLowStockCount > bellLowStock.size()}" class="px-2 pt-2 text-xs text-ash"
+           th:text="|${bellOrderCount} paid order(s) waiting · ${bellLowStockCount} colour(s) low|">…</p>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="flex">
+  <!--/* ---------- Sidebar ---------- */-->
+  <aside data-sidebar class="fixed inset-y-0 left-0 top-14 z-30 hidden w-64 shrink-0 flex-col bg-neutral-50 p-3 md:sticky md:flex md:h-[calc(100vh-3.5rem)]">
+    <a th:href="@{/admin}" class="flex items-center gap-2.5 rounded-md p-2 hover:bg-neutral-100">
+      <span class="grid size-8 place-items-center rounded-lg bg-ink font-display text-sm tracking-wider text-white">LS</span>
+      <span th:replace="~{fragments/layout :: wordmark('text-xl')}"></span>
+    </a>
+
+    <p class="mt-5 px-2 text-xs font-medium text-ash">Platform</p>
+    <nav class="scrollbar-pill mt-1 flex flex-1 flex-col gap-0.5 overflow-y-auto text-sm" aria-label="Admin">
+      <a th:href="@{/admin}" class="flex items-center gap-2.5 rounded-md px-2 py-2 hover:bg-neutral-100"
+         th:classappend="${path == '/admin'} ? 'bg-neutral-200/70 font-semibold'">
+        <svg th:replace="~{fragments/icons :: icon('dashboard', 'size-4')}"></svg> Dashboard
+      </a>
+
+      <details class="group" th:open="${#strings.startsWith(path, '/admin/products')}">
+        <summary class="flex cursor-pointer list-none items-center gap-2.5 rounded-md px-2 py-2 hover:bg-neutral-100"
+                 th:classappend="${#strings.startsWith(path, '/admin/products')} ? 'font-semibold'">
+          <svg th:replace="~{fragments/icons :: icon('shirt', 'size-4')}"></svg> Products
+          <svg th:replace="~{fragments/icons :: icon('chevron-right', 'ml-auto size-4 text-ash transition group-open:rotate-90')}"></svg>
+        </summary>
+        <div class="ml-4 mt-0.5 flex flex-col gap-0.5 pl-3">
+          <a th:href="@{/admin/products}" class="rounded-md px-2 py-1.5 hover:bg-neutral-100"
+             th:classappend="${path == '/admin/products' or (#strings.startsWith(path, '/admin/products/') and path != '/admin/products/new')} ? 'bg-neutral-200/70 font-semibold'">All Products</a>
+          <a th:href="@{/admin/products/new}" class="rounded-md px-2 py-1.5 hover:bg-neutral-100"
+             th:classappend="${path == '/admin/products/new'} ? 'bg-neutral-200/70 font-semibold'">Add Product</a>
+        </div>
+      </details>
+
+      <a th:each="item : ${ { {'/admin/inventory','Inventory','boxes'}, {'/admin/orders','Orders','receipt'}, {'/admin/customers','Customers','users'}, {'/admin/churn','Churn Risk','shield'}, {'/admin/models','Model Health','brain'} } }"
+         th:href="@{${item[0]}}" class="flex items-center gap-2.5 rounded-md px-2 py-2 hover:bg-neutral-100"
+         th:classappend="${#strings.startsWith(path, item[0])} ? 'bg-neutral-200/70 font-semibold'">
+        <svg th:replace="~{fragments/icons :: icon(${item[2]}, 'size-4')}"></svg> <span th:text="${item[1]}">Orders</span>
+      </a>
+    </nav>
+
+    <!--/* Your account */-->
+    <div class="relative" data-dropdown th:if="${me != null}">
+      <button type="button" data-dropdown-toggle class="flex w-full items-center gap-2.5 rounded-md p-2 text-left hover:bg-neutral-100">
+        <span class="grid size-8 shrink-0 place-items-center rounded-lg bg-ink text-xs font-semibold text-white" th:text="${@fmt.initials(me.name)}">LA</span>
+        <span class="min-w-0 flex-1 text-sm leading-tight">
+          <span class="block truncate font-semibold" th:text="${me.name}">LuxuryShop Admin</span>
+          <span class="block truncate text-xs text-ash" th:text="${me.email}">admin@luxuryshop.local</span>
+        </span>
+        <svg th:replace="~{fragments/icons :: icon('chevron-down', 'size-4 text-ash')}"></svg>
+      </button>
+      <div data-dropdown-menu hidden class="absolute bottom-14 left-0 z-50 w-full rounded-lg bg-white p-1 text-sm shadow-xl">
+        <a th:href="@{/}" target="_blank" rel="noopener" class="flex items-center gap-2 rounded-md px-2 py-2 hover:bg-neutral-100">
+          <svg th:replace="~{fragments/icons :: icon('store', 'size-4')}"></svg> View the shop
+        </a>
+        <a href="/swagger-ui.html" target="_blank" rel="noopener" class="flex items-center gap-2 rounded-md px-2 py-2 hover:bg-neutral-100">
+          <svg th:replace="~{fragments/icons :: icon('external', 'size-4')}"></svg> API docs (Swagger)
+        </a>
+        <form th:action="@{/admin/logout}" method="post">
+          <button class="flex w-full items-center gap-2 rounded-md px-2 py-2 text-left hover:bg-neutral-100" data-no-spinner>
+            <svg th:replace="~{fragments/icons :: icon('log-out', 'size-4')}"></svg> Log out
+          </button>
+        </form>
+      </div>
+    </div>
+  </aside>
+
+  <!--/* ---------- Page ---------- */-->
+  <main class="min-w-0 flex-1 px-4 pb-16 pt-2 md:px-8" th:insert="${content}"></main>
+</div>
+
+<th:block th:replace="~{fragments/layout :: feedback}"></th:block>
+<!--/* the page's own scripts (Chart.js, data) load first, so admin.js can use them */-->
+<th:block th:replace="${scripts}"></th:block>
+<script th:src="@{/js/admin.js}"></script>
+</body>
+</html>
+
+<!--/* Page header with an optional right-hand slot */-->
+<div th:fragment="pageHeader(heading, sub)" class="mb-6 mt-4">
+  <h2 class="text-2xl font-semibold tracking-tight" th:text="${heading}">Orders</h2>
+  <p th:if="${sub != null}" class="mt-1 text-sm text-ash" th:text="${sub}">…</p>
+</div>
+
+<!--/* An empty table/list state */-->
+<div th:fragment="empty(icon, title, text)" class="flex flex-col items-center gap-2 rounded-lg bg-neutral-50 px-6 py-16 text-center">
+  <span class="grid size-12 place-items-center rounded-full bg-white text-ash"><svg th:replace="~{fragments/icons :: icon(${icon}, 'size-5')}"></svg></span>
+  <p class="mt-1 font-semibold" th:text="${title}">Nothing here</p>
+  <p class="max-w-sm text-sm text-ash" th:text="${text}">…</p>
+</div>

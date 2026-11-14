@@ -1,0 +1,59 @@
+<!doctype html>
+<html th:replace="~{fragments/admin :: layout(${profile.name}, ~{::#content}, ~{})}" lang="en" xmlns:th="http://www.thymeleaf.org">
+<body>
+<div id="content" th:with="p=${profile}">
+  <a th:href="@{/admin/customers}" class="mt-4 inline-flex items-center gap-1 text-sm text-ash hover:text-ink">
+    <svg th:replace="~{fragments/icons :: icon('chevron-left', 'size-4')}"></svg> All customers
+  </a>
+  <div class="mb-6 mt-3 flex flex-wrap items-center gap-4">
+    <span class="grid size-14 place-items-center rounded-xl bg-ink text-lg font-semibold text-white" th:text="${@fmt.initials(p.name)}">AH</span>
+    <div><h2 class="text-2xl font-semibold tracking-tight" th:text="${p.name}">Amira Hassan</h2>
+      <p class="text-sm text-ash" th:text="|${p.email} · ${@fmt.label(p.role)}|">…</p></div>
+  </div>
+
+  <div class="grid grid-cols-2 gap-3 lg:grid-cols-4">
+    <div class="rounded-lg bg-neutral-50 p-4"><p class="text-xs text-ash">Orders</p><p class="mt-1 text-2xl font-semibold" th:text="${p.orderCount}">3</p></div>
+    <div class="rounded-lg bg-neutral-50 p-4"><p class="text-xs text-ash">Total spent</p><p class="mt-1 text-2xl font-semibold" th:text="${@fmt.money(p.totalSpent)}">$1,555.00</p></div>
+    <div class="rounded-lg bg-neutral-50 p-4"><p class="text-xs text-ash">Tenure</p><p class="mt-1 text-2xl font-semibold" th:text="|${p.tenureDays} days|">609 days</p></div>
+    <div class="rounded-lg bg-neutral-50 p-4"><p class="text-xs text-ash">Churn risk</p><p class="mt-1 text-2xl font-semibold text-ash">—</p><p class="text-xs text-ash">Activates in Phase 7</p></div>
+  </div>
+
+  <div class="mt-5 grid gap-5 lg:grid-cols-[1fr_1.4fr]">
+    <section class="rounded-lg bg-neutral-50 p-5 text-sm">
+      <h3 class="font-semibold">Profile</h3>
+      <dl class="mt-3 grid grid-cols-[8rem_1fr] gap-y-2">
+        <dt class="text-ash">Phone</dt><dd th:text="${p.phone} ?: '—'">…</dd>
+        <dt class="text-ash">Location</dt><dd th:text="${p.city != null or p.country != null} ? |${p.city ?: ''}${p.city != null and p.country != null ? ', ' : ''}${p.country ?: ''}| : '—'">…</dd>
+        <dt class="text-ash">Gender</dt><dd th:text="${@fmt.label(p.gender)}">Female</dd>
+        <dt class="text-ash">Date of birth</dt><dd th:text="${p.dateOfBirth} ?: '—'">…</dd>
+        <dt class="text-ash">Shops for</dt><dd th:text="${p.preferredCategories.isEmpty()} ? '—' : ${#strings.listJoin(p.preferredCategories, ', ')}">women, shoes</dd>
+        <dt class="text-ash">Joined</dt><dd th:text="${@fmt.date(p.createdAt)}">…</dd>
+        <dt class="text-ash">Last login</dt><dd th:text="${@fmt.dateTime(p.lastLoginAt)}">…</dd>
+      </dl>
+      <h3 class="mt-6 font-semibold" th:text="|Devices (${p.deviceCount})|">Devices</h3>
+      <p th:if="${p.devices.isEmpty()}" class="mt-2 text-ash">None recorded.</p>
+      <ul class="mt-2 flex flex-col gap-2">
+        <li th:each="d : ${p.devices}" class="rounded-md bg-white p-3">
+          <p class="font-medium" th:text="|${@fmt.label(d.deviceType)} · ${d.os ?: 'Unknown OS'} · ${d.browser ?: 'Unknown browser'}|">Mobile · iOS · Safari</p>
+          <p class="text-xs text-ash" th:text="|First seen ${@fmt.date(d.firstSeen)} · last ${@fmt.ago(d.lastSeen)}|">…</p>
+        </li>
+      </ul>
+    </section>
+    <section class="rounded-lg bg-neutral-50 p-5 text-sm">
+      <h3 class="font-semibold">Orders</h3>
+      <p th:if="${orders.isEmpty()}" class="py-8 text-center text-ash">No orders yet.</p>
+      <table th:unless="${orders.isEmpty()}" class="mt-3 w-full">
+        <tbody>
+          <tr th:each="o : ${orders}" class="cursor-pointer hover:bg-white" th:attr="data-href=@{/admin/orders/{id}(id=${o.id})}">
+            <td class="rounded-l-md py-2.5 pl-2 font-medium" th:text="${o.orderNumber}">LS-2026-000001</td>
+            <td class="py-2.5 text-ash" th:text="${@fmt.date(o.createdAt)}">…</td>
+            <td class="py-2.5"><span class="rounded-full px-2 py-0.5 text-xs font-semibold" th:classappend="${@fmt.statusClass(o.status)}" th:text="${@fmt.label(o.status)}">Paid</span></td>
+            <td class="rounded-r-md py-2.5 pr-2 text-right font-medium" th:text="${@fmt.money(o.total)}">$605.00</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+  </div>
+</div>
+</body>
+</html>

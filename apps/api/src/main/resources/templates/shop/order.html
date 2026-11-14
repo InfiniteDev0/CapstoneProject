@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head><th:block th:replace="~{fragments/layout :: head(${order.orderNumber})}"></th:block></head>
+<body class="scrollbar-pill">
+<header th:replace="~{fragments/shop :: header}"></header>
+
+<main class="mx-auto max-w-4xl px-4 pt-10 md:px-6">
+  <a th:href="@{/account/orders}" class="inline-flex items-center gap-1 text-sm text-ash hover:text-ink">
+    <svg th:replace="~{fragments/icons :: icon('chevron-left', 'size-4')}"></svg> My orders
+  </a>
+  <div class="mt-3 flex flex-wrap items-center justify-between gap-4">
+    <h1 class="display text-5xl" th:text="${order.orderNumber}">LS-2026-000001</h1>
+    <span class="rounded-full px-3 py-1.5 text-sm font-semibold" th:classappend="${@fmt.statusClass(order.status)}" th:text="${@fmt.label(order.status)}">Delivered</span>
+  </div>
+  <p class="mt-1 text-sm text-ash" th:text="|Placed ${@fmt.dateTime(order.createdAt)}|">Placed…</p>
+
+  <div class="mt-8 grid gap-6 md:grid-cols-[1fr_18rem]">
+    <ul class="flex flex-col gap-3">
+      <li th:each="i : ${order.items}" class="flex justify-between gap-4 rounded-md bg-mist p-4 text-sm">
+        <div>
+          <p class="font-semibold" th:text="${i.productName}">Stratus Runner</p>
+          <p class="text-ash" th:text="|${i.colorName}${i.selectedSize != 'ONE_SIZE' ? ' · Size ' + i.selectedSize : ''} · × ${i.quantity}|">Onyx · Size 8 · × 1</p>
+        </div>
+        <p class="font-semibold" th:text="${@fmt.money(i.lineTotal)}">$420.00</p>
+      </li>
+    </ul>
+    <aside class="flex h-fit flex-col gap-4 rounded-md bg-mist p-5 text-sm">
+      <dl class="flex flex-col gap-2">
+        <div class="flex justify-between"><dt class="text-ash">Subtotal</dt><dd th:text="${@fmt.money(order.subtotal)}">$605.00</dd></div>
+        <div th:if="${order.discountAmount.signum() > 0}" class="flex justify-between"><dt class="text-ash">Discount</dt><dd th:text="|−${@fmt.money(order.discountAmount)}|">−$0</dd></div>
+        <div class="flex justify-between"><dt class="text-ash">Shipping</dt><dd th:text="${order.shippingFee.signum() == 0} ? 'Free' : ${@fmt.money(order.shippingFee)}">Free</dd></div>
+        <div class="flex justify-between pt-2 text-base font-semibold"><dt>Total</dt><dd th:text="${@fmt.money(order.total)}">$605.00</dd></div>
+      </dl>
+      <div>
+        <p class="label">Ship to</p>
+        <p th:text="${order.shippingName}">Amira Hassan</p>
+        <p class="text-ash" th:text="|${order.shippingAddress}, ${order.shippingCity}, ${order.shippingCountry}|">…</p>
+      </div>
+      <div th:if="${order.payment != null}">
+        <p class="label">Payment</p>
+        <p th:text="|${@fmt.label(order.payment.method)}${order.payment.cardLast4 != null ? ' ending ' + order.payment.cardLast4 : ''}|">Card ending 4242</p>
+        <p class="text-ash" th:text="${@fmt.label(order.payment.status)}">Succeeded</p>
+      </div>
+    </aside>
+  </div>
+</main>
+
+<footer th:replace="~{fragments/shop :: footer}"></footer>
+<th:block th:replace="~{fragments/layout :: feedback}"></th:block>
+<script th:src="@{/js/shop.js}"></script>
+</body>
+</html>

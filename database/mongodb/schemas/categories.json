@@ -1,14 +1,26 @@
 {
   "$jsonSchema": {
     "bsonType": "object",
-    "title": "categories: the kinds of things Vela Noire sells",
-    "required": ["name", "slug", "displayOrder"],
+    "title": "categories: the three departments (men, women, shoes) and their subcategories",
+    "required": ["name", "slug", "displayOrder", "subCategories"],
     "properties": {
       "name":         { "bsonType": "string" },
-      "slug":         { "enum": ["abaya", "perfume", "handbag", "bracelet", "shayla", "shoes", "accessory"] },
+      "slug":         { "enum": ["men", "women", "shoes"] },
       "description":  { "bsonType": "string" },
       "image":        { "bsonType": ["string", "null"] },
-      "displayOrder": { "bsonType": "int", "minimum": 0 }
+      "displayOrder": { "bsonType": "int", "minimum": 0 },
+      "subCategories": {
+        "bsonType": "array",
+        "minItems": 1,
+        "items": {
+          "bsonType": "object",
+          "required": ["slug", "name"],
+          "properties": {
+            "slug": { "enum": ["topwear", "bottomwear", "outerwear", "accessories", "running", "training", "lifestyle"] },
+            "name": { "bsonType": "string" }
+          }
+        }
+      }
     }
   }
 }

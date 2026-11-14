@@ -1,0 +1,48 @@
+<!doctype html>
+<html th:replace="~{fragments/admin :: layout('Customers', ~{::#content}, ~{})}" lang="en" xmlns:th="http://www.thymeleaf.org">
+<body>
+<div id="content">
+  <div th:replace="~{fragments/admin :: pageHeader('Customers', |${results.totalItems} customers. Churn risk switches on in Phase 7.|)}"></div>
+
+  <form method="get" class="mb-4 flex flex-wrap gap-2 text-sm">
+    <input name="q" type="search" th:value="${q}" placeholder="Name or email" class="h-9 w-60 rounded-md bg-neutral-100 px-3 outline-none focus:ring-2 focus:ring-ink/70">
+    <select name="sort" class="h-9 rounded-md bg-neutral-100 px-2 outline-none" onchange="this.form.submit()" aria-label="Sort">
+      <option value="newest" th:selected="${sort == 'newest'}">Newest first</option>
+      <option value="oldest" th:selected="${sort == 'oldest'}">Oldest first</option>
+      <option value="name" th:selected="${sort == 'name'}">Name A–Z</option>
+      <option value="last_login" th:selected="${sort == 'last_login'}">Last seen</option>
+    </select>
+    <button class="btn btn-light btn-sm">Search</button>
+  </form>
+
+  <th:block th:if="${results.items.isEmpty()}">
+    <div th:replace="~{fragments/admin :: empty('users', 'No customers found', 'Customers appear here when they create an account.')}"></div>
+  </th:block>
+
+  <div th:unless="${results.items.isEmpty()}" class="scrollbar-pill overflow-x-auto rounded-lg bg-neutral-50">
+    <table class="w-full min-w-[52rem] text-sm">
+      <thead class="text-left text-xs text-ash">
+        <tr><th class="p-3 font-medium">Customer</th><th class="p-3 font-medium">Country</th><th class="p-3 text-right font-medium">Orders</th>
+          <th class="p-3 text-right font-medium">Spent</th><th class="p-3 text-right font-medium">Devices</th><th class="p-3 font-medium">Joined</th>
+          <th class="p-3 font-medium">Last seen</th><th class="p-3 font-medium">Churn risk</th></tr>
+      </thead>
+      <tbody>
+        <tr th:each="c : ${results.items}" class="cursor-pointer hover:bg-white" th:attr="data-href=@{/admin/customers/{id}(id=${c.id})}">
+          <td class="p-3"><div class="flex items-center gap-3">
+            <span class="grid size-8 shrink-0 place-items-center rounded-lg bg-ink text-xs font-semibold text-white" th:text="${@fmt.initials(c.name)}">AH</span>
+            <div class="min-w-0"><p class="truncate font-medium" th:text="${c.name}">Amira Hassan</p><p class="truncate text-xs text-ash" th:text="${c.email}">…</p></div></div></td>
+          <td class="p-3 text-ash" th:text="${c.country} ?: '—'">UAE</td>
+          <td class="p-3 text-right" th:text="${c.orderCount}">3</td>
+          <td class="p-3 text-right font-medium" th:text="${@fmt.money(c.totalSpent)}">$1,555.00</td>
+          <td class="p-3 text-right" th:text="${c.deviceCount}">2</td>
+          <td class="p-3 text-ash" th:text="${@fmt.date(c.createdAt)}">14 Mar 2025</td>
+          <td class="p-3 text-ash" th:text="${@fmt.ago(c.lastLoginAt)}">2 days ago</td>
+          <td class="p-3"><span class="rounded-full bg-neutral-100 px-2 py-0.5 text-xs text-ash" th:text="${c.churnRisk} ?: 'Phase 7'">Phase 7</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <nav th:replace="~{fragments/layout :: pager(${results})}"></nav>
+</div>
+</body>
+</html>

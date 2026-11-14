@@ -1,0 +1,62 @@
+<!doctype html>
+<html th:replace="~{fragments/admin :: layout('Products', ~{::#content}, ~{})}" lang="en" xmlns:th="http://www.thymeleaf.org">
+<body>
+<div id="content">
+  <div class="flex flex-wrap items-end justify-between gap-3">
+    <div th:replace="~{fragments/admin :: pageHeader('Products', |${results.totalItems} products in the catalogue|)}"></div>
+    <a th:href="@{/admin/products/new}" class="btn btn-dark btn-sm mb-6"><svg th:replace="~{fragments/icons :: icon('plus', 'size-4')}"></svg> Add product</a>
+  </div>
+
+  <form method="get" class="mb-4 flex flex-wrap gap-2 text-sm">
+    <input name="q" type="search" th:value="${q}" placeholder="Search name or SKU" class="h-9 w-60 rounded-md bg-neutral-100 px-3 outline-none focus:ring-2 focus:ring-ink/70">
+    <select name="category" class="h-9 rounded-md bg-neutral-100 px-2 outline-none" onchange="this.form.submit()">
+      <option value="">All categories</option>
+      <option th:each="c : ${categories}" th:value="${c.slug}" th:text="${c.name}" th:selected="${category == c.slug}">Men</option>
+    </select>
+    <select name="sub" class="h-9 rounded-md bg-neutral-100 px-2 outline-none" onchange="this.form.submit()">
+      <option value="">All types</option>
+      <option th:each="s : ${ {'topwear','bottomwear','outerwear','accessories','running','training','lifestyle'} }" th:value="${s}" th:text="${@fmt.label(s)}" th:selected="${sub == s}">Topwear</option>
+    </select>
+    <select name="status" class="h-9 rounded-md bg-neutral-100 px-2 outline-none" onchange="this.form.submit()">
+      <option value="">Any status</option>
+      <option th:each="st : ${statuses}" th:value="${st}" th:text="${@fmt.label(st)}" th:selected="${status == st}">Live</option>
+    </select>
+    <button class="btn btn-light btn-sm">Filter</button>
+    <a th:if="${q != null or category != null or sub != null or status != null}" th:href="@{/admin/products}" class="btn btn-sm text-ash hover:text-ink">Clear</a>
+  </form>
+
+  <th:block th:if="${results.items.isEmpty()}">
+    <div th:replace="~{fragments/admin :: empty('shirt', 'No products found', 'Try another search or filter, or add a new product.')}"></div>
+  </th:block>
+
+  <div th:unless="${results.items.isEmpty()}" class="scrollbar-pill overflow-x-auto rounded-lg bg-neutral-50">
+    <table class="w-full min-w-[46rem] text-sm">
+      <thead class="text-left text-xs text-ash">
+        <tr><th class="p-3 font-medium">Product</th><th class="p-3 font-medium">Category</th><th class="p-3 font-medium">Status</th>
+          <th class="p-3 text-right font-medium">Price</th><th class="p-3 text-right font-medium">Colours</th><th class="p-3 text-right font-medium">Stock</th><th class="p-3 font-medium">Updated</th></tr>
+      </thead>
+      <tbody>
+        <tr th:each="p : ${results.items}" class="cursor-pointer hover:bg-white" th:attr="data-href=@{/admin/products/{id}(id=${p.id})}">
+          <td class="p-3">
+            <div class="flex items-center gap-3">
+              <div class="size-10 shrink-0 overflow-hidden rounded-md bg-white">
+                <img th:if="${p.image != null}" th:src="${p.image}" alt="" class="size-full object-cover">
+                <div th:if="${p.image == null}" class="grid size-full place-items-center text-neutral-300"><svg th:replace="~{fragments/icons :: icon('image', 'size-4')}"></svg></div>
+              </div>
+              <div class="min-w-0"><p class="truncate font-medium" th:text="${p.name}">Men's Aero Knit Tee</p><p class="truncate text-xs text-ash" th:text="${p.slug}">mens-aero-knit-tee</p></div>
+            </div>
+          </td>
+          <td class="p-3 text-ash" th:text="|${@fmt.label(p.category)} · ${@fmt.label(p.subCategory)}|">Men · Topwear</td>
+          <td class="p-3"><span class="rounded-full px-2 py-0.5 text-xs font-semibold" th:classappend="${@fmt.productStatusClass(p.status)}" th:text="${@fmt.label(p.status)}">Live</span></td>
+          <td class="p-3 text-right" th:text="${@fmt.money(p.basePrice)}">$120.00</td>
+          <td class="p-3 text-right" th:text="${p.variantCount}">3</td>
+          <td class="p-3 text-right"><span th:text="${p.totalStock}" th:classappend="${p.lowStock} ? 'font-semibold text-amber-700'">54</span></td>
+          <td class="p-3 text-ash" th:text="${@fmt.date(p.updatedAt)}">12 Nov 2026</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <nav th:replace="~{fragments/layout :: pager(${results})}"></nav>
+</div>
+</body>
+</html>

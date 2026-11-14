@@ -1,71 +1,99 @@
-# Vela Noire API
+# LuxuryShop app (Spring Boot)
 
-The backend of the Vela Noire shop and admin: a **Java 17 / Spring Boot 4.1** REST API.
-It stores accounts, carts and orders in **MySQL** and the catalogue, reviews and clickstream in **MongoDB**.
+One **Java 17 / Spring Boot 4.1** application that does everything:
+
+- it **serves the web pages** (customer shop and admin portal) with **Thymeleaf**
+- it exposes a **REST API** (`/api/**`, JWT) for the Python AI service, the tests and Swagger
+- it stores accounts, carts and orders in **MySQL**, and the catalogue, reviews and clickstream in **MongoDB**
 
 ```
-Shop (Next.js :3000) ─┐
-                      ├─► API (Spring Boot :8080) ─┬─► MySQL   users, devices, wishlist, cart, orders, payments
-Admin (Next.js :3001) ┘                            └─► MongoDB products, categories, collections, reviews, clicks
+Browser ──► Spring Boot :8080 ─┬─ /            shop pages      (Thymeleaf, session login + CSRF)
+                               ├─ /admin/**    admin pages     (Thymeleaf, ADMIN only)
+                               ├─ /api/**      REST API        (JSON, JWT)
+                               │
+                               ├─► MySQL   users, devices, wishlist, cart, orders, payments
+                               └─► MongoDB products, categories, reviews, clickstream
 ```
 
 ## Run it
 
-You need **JDK 17+**, plus MySQL and MongoDB running with the `vela_noire` databases (see [`database/README.md`](../../database/README.md)). Maven is not needed: the wrapper (`mvnw`) downloads it.
+You need **JDK 17+**, **Node 22 + pnpm** (only to build the CSS), and MySQL + MongoDB with the `luxuryshop` databases (see [`database/README.md`](../../database/README.md)). Maven is not needed: the wrapper (`mvnw`) downloads it.
 
-1. Fill in the root `.env` (copy `.env.example`): the MySQL `vela_app` password and a `JWT_SECRET`. The API reads it automatically.
-2. Start the API from the project root:
+1. Fill in the root `.env` (copy `.env.example`): the MySQL `luxury_app` password and a `JWT_SECRET`. The app reads it automatically.
+2. From the project root:
    ```powershell
-   pnpm dev:api
+   pnpm install      # once: the Tailwind CLI
+   pnpm dev          # Tailwind watcher + Spring Boot (dev profile: template edits show on refresh)
    ```
-   or from `apps/api`: `.\mvnw.cmd spring-boot:run` (Windows) / `./mvnw spring-boot:run` (macOS/Linux).
-3. Open **http://localhost:8080/swagger-ui.html** to try every endpoint in the browser.
+   `pnpm dev:api` starts only Java. Without pnpm: `cd apps/api; .\mvnw.cmd spring-boot:run` (the built CSS is committed).
+3. Open:
 
-| Check | URL |
+| What | URL |
 |---|---|
-| Health (API, MySQL, MongoDB) | http://localhost:8080/api/health |
-| Swagger UI | http://localhost:8080/swagger-ui.html |
-| OpenAPI JSON | http://localhost:8080/v3/api-docs |
+| Shop | http://localhost:8080 |
+| Admin | http://localhost:8080/admin |
+| Health (app, MySQL, MongoDB) | http://localhost:8080/api/health |
+| Swagger UI (REST API) | http://localhost:8080/swagger-ui.html |
 
-### Logging in with Swagger
-1. `POST /api/auth/login` with a demo account (the demo passwords are listed in `database/README.md`).
-2. Copy the `token` from the response, click **Authorize**, and paste it.
-3. Every request now carries `Authorization: Bearer <token>`.
+The demo logins are in [`database/README.md`](../../database/README.md).
+
+### Styles
+The look lives in [`styles/app.css`](styles/app.css) (Tailwind v4). `pnpm css:build` writes `src/main/resources/static/css/app.css` (minified, committed so Java runs on its own). `pnpm css:watch` rebuilds on every template change.
 
 ### Tests
 ```powershell
-cd apps/api
-.\mvnw.cmd test
+pnpm test:api            # or: cd apps/api; .\mvnw.cmd test
 ```
-MockMvc tests cover: login works, a wrong password fails, a customer is blocked from admin routes, and checkout lowers stock. They use the local seeded databases and put back everything they change.
+- **ApiFlowTests** (REST): login works, a wrong password fails, a customer is blocked from admin routes, a product with sizes needs one, and checkout lowers stock.
+- **WebPagesTests** (Thymeleaf): browsing pages render, an unknown product shows the 404 page, private pages ask guests to log in, shop login works and a form without its CSRF token is refused, and the admin door refuses customers but lets the admin in.
+
+They use the local seeded databases and put back everything they change.
 
 ## How the code is organised (MVC)
 
 | Package | Role | Restaurant analogy |
 |---|---|---|
-| `controller` | HTTP endpoints; no business logic | the waiter |
+| `web/pages/shop`, `web/pages/admin` | page controllers: fill a Thymeleaf template with data | the waiters who plate the food |
+| `web/actions` | small JSON calls the pages make (add to bag, like, quantity) | the runner |
+| `controller` | the REST API (`/api/**`) | the hatch for take-away orders |
 | `service` | business rules (stock, prices, checkout) | the chef |
 | `repository/jpa`, `repository/mongo` | read/write MySQL and MongoDB | the storeroom keepers |
 | `model/entity`, `model/document` | the shape of MySQL rows and MongoDB documents | the moulds |
-| `dto` | what goes in and out as JSON (never the password hash) | order tickets and plates |
-| `security` | BCrypt, JWT filter, role rules, CORS | the bouncer and wristbands |
-| `exception` | one error shape for everything | the complaints desk |
-| `config` | JWT settings, Swagger | the notice board |
+| `dto` | what goes in and out (never the password hash) | order tickets |
+| `security` | BCrypt, the 3 doors (API JWT, admin session, shop session), CSRF | the bouncers and wristbands |
+| `exception`, `web/WebErrorAdvice` | one JSON error shape for the API, a friendly error page for the web | the complaints desk |
+| `templates/` | Thymeleaf pages; `fragments/` holds the navbar, footer, product card, admin sidebar and top bar (written once) | the plates |
 
 Key decisions:
+- **Same services for pages and API.** A page controller and its REST twin call the same service, so the rules (stock, sizes, prices) live in one place.
+- **Two web logins, one browser.** The shop and the admin keep their logins under different session keys, so signing in to one never signs you in to the other. Both use Spring Security form login with **CSRF** tokens; `/api/**` stays stateless with **JWT**.
 - **`ddl-auto=validate`:** the tables come from `database/mysql/schema.sql`. Hibernate only checks that the Java classes match them.
-- **No cross-database foreign keys:** before writing a cart or order row, the services check in MongoDB that the product, colour and stock exist.
-- **Checkout across two databases:** stock is taken in MongoDB with one atomic conditional update per colour. The order, its lines, the payment and the emptied cart are then written in one MySQL `@Transactional`. If the MySQL write fails, the stock is given back.
-- **Errors** always look like `{ "error": "Not Found", "message": "...", "status": 404 }`.
+- **No cross-database foreign keys:** before writing a cart or order row, the services check in MongoDB that the product, colour, size and stock exist.
+- **Checkout across two databases:** stock is taken in MongoDB with one atomic conditional update per colour. The order, its lines, the payment and the emptied bag are then written in one MySQL `@Transactional`. If the MySQL write fails, the stock is given back.
+- **Clickstream:** the product page logs a VIEW and the search page a SEARCH; the cart, wishlist and checkout log ADD_TO_CART, REMOVE_FROM_CART, WISHLIST and PURCHASE. Web clicks share the browser session as their visit id.
+- **Photos:** products start with none (a blank box shows). The admin uploads them on the product page; they are saved in `uploads/` (git-ignored) and served at `/uploads/**`. Page photos (hero, tiles) go in `static/images/` (see its README).
 
-## Endpoints
+## Web pages
 
-🔓 public · 🔑 any logged-in user · 👑 ADMIN only
+| Shop | | Admin (ADMIN only) | |
+|---|---|---|---|
+| `/` | home: hero, New Arrivals, New In, best sellers | `/admin/login` | admin sign-in (customers are refused) |
+| `/categories/{men\|women\|shoes\|new}` | browse: subcategory, size, price, sort | `/admin` | dashboard: sales, orders, active users, churn (Phase 7), charts |
+| `/search?q=` | search | `/admin/products`, `/new`, `/{id}` | list, add, edit, photos, delete |
+| `/product/{slug}` | product page, reviews, related products | `/admin/inventory` | low / sold-out / all colours, restock |
+| `/cart`, `/checkout` | bag and simulated checkout 🔑 | `/admin/orders`, `/{id}` | orders and status moves |
+| `/liked` | favourites 🔑 | `/admin/customers`, `/{id}` | customers and profiles |
+| `/account`, `/account/orders` | profile, devices, orders 🔑 | `/admin/churn`, `/admin/models` | AI pages (Phase 7) |
+| `/login`, `/register` | sign in / sign up | `/admin/search?q=` | search everything |
+
+## REST API
+
+🔓 public · 🔑 any logged-in user · 👑 ADMIN only. Log in with `POST /api/auth/login`, then send `Authorization: Bearer <token>` (Swagger: **Authorize**).
 
 ### Auth and health
 | Method | Path | | What it does |
 |---|---|---|---|
-| GET | `/api/health` | 🔓 | API, MySQL and MongoDB status |
+| GET | `/api/health` | 🔓 | App, MySQL and MongoDB status |
 | POST | `/api/auth/register` | 🔓 | Create a customer account, returns a token |
 | POST | `/api/auth/login` | 🔓 | Log in, returns a token (records the device from the User-Agent) |
 | GET | `/api/auth/me` | 🔑 | Who am I |
@@ -73,10 +101,9 @@ Key decisions:
 ### Store (MongoDB)
 | Method | Path | | What it does |
 |---|---|---|---|
-| GET | `/api/store/products` | 🔓 | Browse. Filters: `category`, `collection`, `season`, `seasonalLine`, `minPrice`, `maxPrice`, `tags` (repeat), `q` (text search). `sort` = newest, price_asc, price_desc, rating, popular, relevance. `page` (from 0) and `size` |
-| GET | `/api/store/products/{slug}` | 🔓 | Product page: specs, colours with stock, ratings |
-| GET | `/api/store/categories` | 🔓 | Categories in menu order |
-| GET | `/api/store/collections` | 🔓 | Collections (Seasonal includes its 4 lines) |
+| GET | `/api/store/products` | 🔓 | Browse. Filters: `category` (men, women, shoes), `subCategory`, `isNew`, `isBestSeller`, `productSize`, `minPrice`, `maxPrice`, `tags` (repeat), `q` (text search). `sort` = newest, price_asc, price_desc, rating, popular, relevance. `page` (from 0) and `size` |
+| GET | `/api/store/products/{slug}` | 🔓 | Product: sizes, attributes, colours with stock, ratings |
+| GET | `/api/store/categories` | 🔓 | Categories with their subcategories, in menu order |
 | GET | `/api/store/products/{id}/reviews` | 🔓 | Reviews, newest first |
 | POST | `/api/store/products/{id}/reviews` | 🔑 | Rate 1–5 (one review per product; "verified purchase" checked against MySQL orders) |
 
@@ -85,11 +112,11 @@ Key decisions:
 |---|---|---|---|
 | GET | `/api/user/me` | 🔑 | Profile: demographics, preferred categories, tenure, devices, order totals |
 | PATCH | `/api/user/me` | 🔑 | Update profile fields |
-| GET | `/api/wishlist` | 🔑 | My hearted products |
-| POST | `/api/wishlist` | 🔑 | Heart a product `{ productId }` |
-| DELETE | `/api/wishlist/{productId}` | 🔑 | Un-heart |
+| GET | `/api/wishlist` | 🔑 | My liked products |
+| POST | `/api/wishlist` | 🔑 | Like a product `{ productId }` |
+| DELETE | `/api/wishlist/{productId}` | 🔑 | Unlike |
 | GET | `/api/cart` | 🔑 | My bag, priced live (free shipping from $75) |
-| POST | `/api/cart/items` | 🔑 | Add `{ productId, sku, quantity, selectedSize? (abayas), selectedStyle?, shaylaType? }` |
+| POST | `/api/cart/items` | 🔑 | Add `{ productId, sku, quantity, selectedSize }` (size required when the product has sizes) |
 | PATCH | `/api/cart/items/{itemId}` | 🔑 | Change quantity |
 | DELETE | `/api/cart/items/{itemId}` | 🔑 | Remove a line |
 | DELETE | `/api/cart` | 🔑 | Empty the bag |
@@ -98,16 +125,14 @@ Key decisions:
 | GET | `/api/orders/{id}` | 🔑 | One of my orders |
 | POST | `/api/events` | 🔓 | Log a click `{ type, sessionId, productId?, category?, query?, page? }`. With a token, it is tied to the customer |
 
-Cart, wishlist and checkout also log their own clickstream events (ADD_TO_CART, REMOVE_FROM_CART, WISHLIST, PURCHASE). The shop can send `X-Session-Id` so these join the visit's session.
-
 ### Admin
 | Method | Path | | What it does |
 |---|---|---|---|
 | GET | `/api/admin/dashboard/stats` | 👑 | Total sales, order count, average order, customers, active users (30 days), new customers, low-stock colours, top categories, sales by month |
-| GET | `/api/admin/products` | 👑 | All products, any status (`q`, `category`, `status`, pages) |
+| GET | `/api/admin/products` | 👑 | All products, any status (`q`, `category`, `subCategory`, `status`, pages) |
 | GET | `/api/admin/products/{id}` | 👑 | One product |
 | POST | `/api/admin/products` | 👑 | Create (status defaults to IN_PRODUCTION, hidden from the shop) |
-| PUT | `/api/admin/products/{id}` | 👑 | Replace details and colours |
+| PUT | `/api/admin/products/{id}` | 👑 | Replace details, sizes, attributes and colours |
 | DELETE | `/api/admin/products/{id}` | 👑 | Delete, plus its reviews and any cart or wishlist rows |
 | POST | `/api/admin/products/{id}/variants` | 👑 | Add a colour |
 | PATCH | `/api/admin/products/{id}/variants/{sku}` | 👑 | Change a colour |

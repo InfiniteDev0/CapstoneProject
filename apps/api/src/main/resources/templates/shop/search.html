@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head><th:block th:replace="~{fragments/layout :: head('Search')}"></th:block></head>
+<body class="scrollbar-pill">
+<header th:replace="~{fragments/shop :: header}"></header>
+
+<main class="mx-auto max-w-7xl px-4 pt-10 md:px-6">
+  <form th:action="@{/search}" method="get" role="search" class="mx-auto flex max-w-2xl gap-2">
+    <input name="q" type="search" th:value="${q}" placeholder="Search tees, coats, runners…" class="field h-12 text-base" aria-label="Search products" autofocus>
+    <button class="btn btn-dark h-12">Search</button>
+  </form>
+
+  <th:block th:if="${q.isEmpty()}">
+    <div th:replace="~{fragments/shop :: empty('search', 'What are you looking for?', 'Search by name, fabric or style, for example merino, puffer or runner.')}"></div>
+  </th:block>
+
+  <th:block th:unless="${q.isEmpty()}">
+    <h1 class="display mt-12 text-4xl md:text-5xl">Results for "<span th:text="${q}">merino</span>"</h1>
+    <p class="mt-1 text-sm text-ash"><span th:text="${results.totalItems}">3</span> items</p>
+    <th:block th:if="${results.items.isEmpty()}">
+      <div th:replace="~{fragments/shop :: empty('search', 'No results', 'Check the spelling or try a more general word.')}"></div>
+    </th:block>
+    <div th:unless="${results.items.isEmpty()}" class="mt-8 grid grid-cols-2 gap-x-4 gap-y-10 md:grid-cols-4">
+      <th:block th:each="p : ${results.items}"><article th:replace="~{fragments/shop :: card(${p}, ${likedIds})}"></article></th:block>
+    </div>
+    <nav th:replace="~{fragments/layout :: pager(${results})}"></nav>
+  </th:block>
+</main>
+
+<footer th:replace="~{fragments/shop :: footer}"></footer>
+<th:block th:replace="~{fragments/layout :: feedback}"></th:block>
+<script th:src="@{/js/shop.js}"></script>
+</body>
+</html>

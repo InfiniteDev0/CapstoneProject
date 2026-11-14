@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head><th:block th:replace="~{fragments/layout :: head(${heading})}"></th:block></head>
+<body class="scrollbar-pill">
+<header th:replace="~{fragments/shop :: header}"></header>
+
+<main class="mx-auto max-w-7xl px-4 pt-10 md:px-6">
+  <div class="flex flex-wrap items-end justify-between gap-4">
+    <div>
+      <h1 class="display text-5xl md:text-6xl" th:text="${heading}">Men</h1>
+      <p class="mt-1 text-sm text-ash" th:text="${category != null} ? ${category.description} : 'The latest pieces across men, women and shoes.'">…</p>
+    </div>
+    <form method="get" class="flex items-center gap-2 text-sm" data-no-spinner>
+      <input type="hidden" name="sub" th:value="${sub}">
+      <input type="hidden" name="size" th:value="${size}">
+      <input type="hidden" name="minPrice" th:value="${minPrice}">
+      <input type="hidden" name="maxPrice" th:value="${maxPrice}">
+      <label for="sort" class="text-ash">Sort</label>
+      <select id="sort" name="sort" onchange="this.form.submit()" class="h-10 rounded-md bg-mist px-3 outline-none">
+        <option value="newest" th:selected="${sort == 'newest'}">Newest</option>
+        <option value="popular" th:selected="${sort == 'popular'}">Best sellers</option>
+        <option value="price_asc" th:selected="${sort == 'price_asc'}">Price: low to high</option>
+        <option value="price_desc" th:selected="${sort == 'price_desc'}">Price: high to low</option>
+        <option value="rating" th:selected="${sort == 'rating'}">Top rated</option>
+      </select>
+    </form>
+  </div>
+
+  <div class="mt-8 grid gap-10 lg:grid-cols-[15rem_1fr]">
+    <!--/* Left: filters (an accordion, like the Under-Armour page) */-->
+    <aside class="text-sm">
+      <details class="group lg:pointer-events-none" open>
+        <summary class="flex cursor-pointer list-none items-center justify-between py-1 lg:cursor-default">
+          <span class="display text-2xl">Filter</span>
+          <svg th:replace="~{fragments/icons :: icon('filter', 'size-4 lg:hidden')}"></svg>
+        </summary>
+        <div class="mt-4 flex flex-col gap-6 lg:pointer-events-auto">
+
+          <details th:if="${category != null}" open class="group/sub">
+            <summary class="flex cursor-pointer list-none items-center justify-between py-2 font-semibold">
+              Product type <svg th:replace="~{fragments/icons :: icon('chevron-down', 'size-4 transition group-open/sub:rotate-180')}"></svg>
+            </summary>
+            <ul class="mt-1 flex flex-col gap-1">
+              <li><a th:with="u=${@fmt.withParam('sub', null)}" th:href="${u}" class="block rounded-md px-2 py-1.5 hover:bg-mist"
+                     th:classappend="${sub == null} ? 'font-semibold text-crimson'">All</a></li>
+              <li th:each="s : ${category.subCategories}">
+                <a th:with="u=${@fmt.withParam('sub', s.slug)}" th:href="${u}" th:text="${s.name}" class="block rounded-md px-2 py-1.5 hover:bg-mist"
+                   th:classappend="${sub == s.slug} ? 'font-semibold text-crimson'">Topwear</a>
+              </li>
+            </ul>
+          </details>
+
+          <details open class="group/size">
+            <summary class="flex cursor-pointer list-none items-center justify-between py-2 font-semibold">
+              Size <svg th:replace="~{fragments/icons :: icon('chevron-down', 'size-4 transition group-open/size:rotate-180')}"></svg>
+            </summary>
+            <div class="mt-2 flex flex-wrap gap-2">
+              <a th:each="z : ${sizeOptions}" th:with="u=${@fmt.withParam('size', size == z ? null : z)}" th:href="${u}" th:text="${z}"
+                 class="grid h-9 min-w-11 place-items-center rounded-md px-2 text-xs font-semibold"
+                 th:classappend="${size == z} ? 'bg-ink text-white' : 'bg-mist hover:bg-smoke'">M</a>
+            </div>
+          </details>
+
+          <details open class="group/price">
+            <summary class="flex cursor-pointer list-none items-center justify-between py-2 font-semibold">
+              Price <svg th:replace="~{fragments/icons :: icon('chevron-down', 'size-4 transition group-open/price:rotate-180')}"></svg>
+            </summary>
+            <form method="get" class="mt-2 flex flex-col gap-2" data-no-spinner>
+              <input type="hidden" name="sub" th:value="${sub}">
+              <input type="hidden" name="size" th:value="${size}">
+              <input type="hidden" name="sort" th:value="${sort}">
+              <div class="flex items-center gap-2">
+                <input name="minPrice" type="number" min="0" step="10" th:value="${minPrice}" placeholder="Min $" class="field" aria-label="Minimum price">
+                <span class="text-ash">–</span>
+                <input name="maxPrice" type="number" min="0" step="10" th:value="${maxPrice}" placeholder="Max $" class="field" aria-label="Maximum price">
+              </div>
+              <button class="btn btn-light btn-sm">Apply</button>
+            </form>
+          </details>
+
+          <a th:if="${sub != null or size != null or minPrice != null or maxPrice != null}" th:href="@{/categories/{s}(s=${slug})}"
+             class="text-xs font-semibold underline underline-offset-4 hover:text-crimson">Clear filters</a>
+        </div>
+      </details>
+    </aside>
+
+    <!--/* Right: item count + grid */-->
+    <section>
+      <p class="mb-5 text-sm text-ash"><span class="font-semibold text-ink" th:text="${results.totalItems}">24</span> items</p>
+      <th:block th:if="${results.items.isEmpty()}">
+        <div th:replace="~{fragments/shop :: empty('search', 'No pieces match', 'Try another size, a wider price range, or clear the filters.')}"></div>
+      </th:block>
+      <div th:unless="${results.items.isEmpty()}" class="grid grid-cols-2 gap-x-4 gap-y-10 md:grid-cols-3">
+        <th:block th:each="p : ${results.items}"><article th:replace="~{fragments/shop :: card(${p}, ${likedIds})}"></article></th:block>
+      </div>
+      <nav th:replace="~{fragments/layout :: pager(${results})}"></nav>
+    </section>
+  </div>
+</main>
+
+<footer th:replace="~{fragments/shop :: footer}"></footer>
+<th:block th:replace="~{fragments/layout :: feedback}"></th:block>
+<script th:src="@{/js/shop.js}"></script>
+</body>
+</html>

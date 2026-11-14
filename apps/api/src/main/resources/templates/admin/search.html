@@ -1,0 +1,33 @@
+<!doctype html>
+<html th:replace="~{fragments/admin :: layout('Search', ~{::#content}, ~{})}" lang="en" xmlns:th="http://www.thymeleaf.org">
+<body>
+<div id="content">
+  <div th:replace="~{fragments/admin :: pageHeader(${q.isEmpty()} ? 'Search' : |Results for: ${q}|, 'Products, orders and customers.')}"></div>
+
+  <th:block th:if="${q.isEmpty()}">
+    <div th:replace="~{fragments/admin :: empty('search', 'Search the whole admin', 'Type a product name or SKU, an order number, or a customer name or email in the bar above.')}"></div>
+  </th:block>
+
+  <div th:unless="${q.isEmpty()}" class="grid gap-5 lg:grid-cols-3">
+    <section class="rounded-lg bg-neutral-50 p-5 text-sm">
+      <h3 class="font-semibold" th:text="|Products (${productHits.totalItems})|">Products</h3>
+      <p th:if="${productHits.items.isEmpty()}" class="mt-3 text-ash">No products.</p>
+      <a th:each="p : ${productHits.items}" th:href="@{/admin/products/{id}(id=${p.id})}" class="mt-1 block rounded-md p-2 hover:bg-white">
+        <span class="block font-medium" th:text="${p.name}">…</span><span class="text-xs text-ash" th:text="|${@fmt.label(p.category)} · ${@fmt.money(p.basePrice)}|">…</span></a>
+    </section>
+    <section class="rounded-lg bg-neutral-50 p-5 text-sm">
+      <h3 class="font-semibold" th:text="|Orders (${orderHits.totalItems})|">Orders</h3>
+      <p th:if="${orderHits.items.isEmpty()}" class="mt-3 text-ash">No orders.</p>
+      <a th:each="o : ${orderHits.items}" th:href="@{/admin/orders/{id}(id=${o.id})}" class="mt-1 block rounded-md p-2 hover:bg-white">
+        <span class="block font-medium" th:text="${o.orderNumber}">…</span><span class="text-xs text-ash" th:text="|${o.customerName} · ${@fmt.money(o.total)} · ${@fmt.label(o.status)}|">…</span></a>
+    </section>
+    <section class="rounded-lg bg-neutral-50 p-5 text-sm">
+      <h3 class="font-semibold" th:text="|Customers (${customerHits.totalItems})|">Customers</h3>
+      <p th:if="${customerHits.items.isEmpty()}" class="mt-3 text-ash">No customers.</p>
+      <a th:each="c : ${customerHits.items}" th:href="@{/admin/customers/{id}(id=${c.id})}" class="mt-1 block rounded-md p-2 hover:bg-white">
+        <span class="block font-medium" th:text="${c.name}">…</span><span class="text-xs text-ash" th:text="${c.email}">…</span></a>
+    </section>
+  </div>
+</div>
+</body>
+</html>

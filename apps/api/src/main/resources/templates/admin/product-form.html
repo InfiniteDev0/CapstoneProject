@@ -1,0 +1,181 @@
+<!doctype html>
+<html th:replace="~{fragments/admin :: layout(${product == null} ? 'Add product' : ${product.name}, ~{::#content}, ~{})}" lang="en" xmlns:th="http://www.thymeleaf.org">
+<body>
+<div id="content" th:with="editing=${product != null}">
+  <a th:href="@{/admin/products}" class="mt-4 inline-flex items-center gap-1 text-sm text-ash hover:text-ink">
+    <svg th:replace="~{fragments/icons :: icon('chevron-left', 'size-4')}"></svg> All products
+  </a>
+  <div class="mb-6 mt-2 flex flex-wrap items-center justify-between gap-3">
+    <h2 class="text-2xl font-semibold tracking-tight" th:text="${editing} ? ${product.name} : 'Add product'">Add product</h2>
+    <a th:if="${editing and product.status == 'LIVE'}" th:href="@{/product/{s}(s=${product.slug})}" target="_blank" rel="noopener" class="btn btn-light btn-sm">
+      <svg th:replace="~{fragments/icons :: icon('external', 'size-4')}"></svg> View in shop
+    </a>
+  </div>
+
+  <div th:if="${error}" class="mb-5 flex items-start gap-3 rounded-md bg-rose-50 p-4 text-sm text-rose-800" role="alert">
+    <svg th:replace="~{fragments/icons :: icon('alert', 'size-5 shrink-0')}"></svg><span th:text="${error}">…</span>
+  </div>
+
+  <form th:action="${editing} ? @{/admin/products/{id}(id=${product.id})} : @{/admin/products}" method="post" class="grid gap-5 xl:grid-cols-[1fr_22rem]" data-product-form>
+    <div class="flex flex-col gap-5">
+      <!--/* Basics */-->
+      <section class="rounded-lg bg-neutral-50 p-5">
+        <h3 class="font-semibold">Basics</h3>
+        <div class="mt-4 grid gap-4 sm:grid-cols-2">
+          <div class="sm:col-span-2"><label class="mb-1.5 block text-sm font-medium" for="name">Name *</label>
+            <input id="name" name="name" th:value="${form.name}" required maxlength="200" class="field bg-white" placeholder="Men's Aero Knit Tee"></div>
+          <div class="sm:col-span-2"><label class="mb-1.5 block text-sm font-medium" for="slug">Web address <span class="font-normal text-ash">(left empty: made from the name)</span></label>
+            <input id="slug" name="slug" th:value="${form.slug}" pattern="[a-z0-9]+(-[a-z0-9]+)*" class="field bg-white" placeholder="mens-aero-knit-tee"></div>
+          <div class="sm:col-span-2"><label class="mb-1.5 block text-sm font-medium" for="description">Description</label>
+            <textarea id="description" name="description" rows="3" maxlength="4000" class="field bg-white" th:text="${form.description}"></textarea></div>
+        </div>
+      </section>
+
+      <!--/* Sizes + specs */-->
+      <section class="rounded-lg bg-neutral-50 p-5">
+        <h3 class="font-semibold">Sizes and details</h3>
+        <label class="mb-1.5 mt-4 block text-sm font-medium" for="sizes">Sizes <span class="font-normal text-ash">(comma separated; empty = one size)</span></label>
+        <input id="sizes" name="sizes" th:value="${form.sizes}" class="field bg-white" placeholder="S, M, L, XL">
+        <div class="mt-2 flex flex-wrap gap-2 text-xs">
+          <button type="button" class="rounded-md bg-white px-2.5 py-1 hover:bg-neutral-200" data-sizes="XS, S, M, L, XL">Women XS–XL</button>
+          <button type="button" class="rounded-md bg-white px-2.5 py-1 hover:bg-neutral-200" data-sizes="S, M, L, XL, XXL">Men S–XXL</button>
+          <button type="button" class="rounded-md bg-white px-2.5 py-1 hover:bg-neutral-200" data-sizes="6, 7, 8, 9, 10, 11, 12">Shoes 6–12</button>
+          <button type="button" class="rounded-md bg-white px-2.5 py-1 hover:bg-neutral-200" data-sizes="">One size</button>
+        </div>
+
+        <p class="mb-1.5 mt-5 text-sm font-medium">Details <span class="font-normal text-ash">(shown on the product page, e.g. Material: Merino wool)</span></p>
+        <div class="flex flex-col gap-2" data-rows="attrs">
+          <div th:each="name, i : ${form.attrNames}" class="grid grid-cols-[1fr_2fr_auto] gap-2" data-row>
+            <input name="attrNames" th:value="${name}" class="field bg-white" placeholder="Material" maxlength="40">
+            <input name="attrValues" th:value="${form.attrValues.size() > i.index} ? ${form.attrValues[i.index]} : ''" class="field bg-white" placeholder="Merino wool" maxlength="200">
+            <button type="button" class="grid size-10 place-items-center rounded-md text-ash hover:bg-white hover:text-crimson" data-remove-row aria-label="Remove">
+              <svg th:replace="~{fragments/icons :: icon('trash', 'size-4')}"></svg></button>
+          </div>
+        </div>
+        <template data-template="attrs">
+          <div class="grid grid-cols-[1fr_2fr_auto] gap-2" data-row>
+            <input name="attrNames" class="field bg-white" placeholder="Fit" maxlength="40">
+            <input name="attrValues" class="field bg-white" placeholder="Relaxed" maxlength="200">
+            <button type="button" class="grid size-10 place-items-center rounded-md text-ash hover:bg-white hover:text-crimson" data-remove-row aria-label="Remove">✕</button>
+          </div>
+        </template>
+        <button type="button" class="mt-2 text-sm font-medium text-ash hover:text-ink" data-add-row="attrs">+ Add a detail</button>
+      </section>
+
+      <!--/* Colours */-->
+      <section class="rounded-lg bg-neutral-50 p-5">
+        <h3 class="font-semibold">Colours and stock</h3>
+        <p class="mt-1 text-xs text-ash">One row per colour. Stock is counted per colour. SKU like LS-M-TOP-01-ONY.</p>
+        <div class="scrollbar-pill mt-4 overflow-x-auto">
+          <div class="flex min-w-[40rem] flex-col gap-2" data-rows="colours">
+            <div class="grid grid-cols-[2fr_1.4fr_3rem_5.5rem_6rem_3.5rem_2.5rem] gap-2 px-1 text-xs text-ash">
+              <span>SKU *</span><span>Colour *</span><span></span><span>Stock *</span><span>Price ($)</span><span>Default</span><span></span>
+            </div>
+            <div th:each="c, i : ${form.variants}" class="grid grid-cols-[2fr_1.4fr_3rem_5.5rem_6rem_3.5rem_2.5rem] items-center gap-2" data-row>
+              <input th:name="|variants[${i.index}].sku|" th:value="${c.sku}" class="field bg-white uppercase" placeholder="LS-M-TOP-01-ONY" maxlength="40" required>
+              <input th:name="|variants[${i.index}].colorName|" th:value="${c.colorName}" class="field bg-white" placeholder="Onyx" maxlength="60" required>
+              <input type="color" th:name="|variants[${i.index}].colorHex|" th:value="${c.colorHex}" class="h-10 w-12 cursor-pointer rounded-md bg-white p-1" aria-label="Colour">
+              <input type="number" min="0" th:name="|variants[${i.index}].stock|" th:value="${c.stock}" class="field bg-white" required>
+              <input type="number" min="0" step="0.01" th:name="|variants[${i.index}].priceOverride|" th:value="${c.priceOverride}" class="field bg-white" placeholder="same">
+              <input type="radio" name="defaultColour" th:value="${i.index}" th:checked="${form.defaultColour == i.index}" class="mx-auto size-4 accent-black" aria-label="Default colour">
+              <button type="button" class="grid size-10 place-items-center rounded-md text-ash hover:bg-white hover:text-crimson" data-remove-row aria-label="Remove">
+                <svg th:replace="~{fragments/icons :: icon('trash', 'size-4')}"></svg></button>
+            </div>
+          </div>
+        </div>
+        <template data-template="colours">
+          <div class="grid grid-cols-[2fr_1.4fr_3rem_5.5rem_6rem_3.5rem_2.5rem] items-center gap-2" data-row>
+            <input name="variants[__i__].sku" class="field bg-white uppercase" placeholder="LS-M-TOP-01-ONY" maxlength="40" required>
+            <input name="variants[__i__].colorName" class="field bg-white" placeholder="Onyx" maxlength="60" required>
+            <input type="color" name="variants[__i__].colorHex" value="#111111" class="h-10 w-12 cursor-pointer rounded-md bg-white p-1" aria-label="Colour">
+            <input type="number" min="0" name="variants[__i__].stock" value="0" class="field bg-white" required>
+            <input type="number" min="0" step="0.01" name="variants[__i__].priceOverride" class="field bg-white" placeholder="same">
+            <input type="radio" name="defaultColour" value="__i__" class="mx-auto size-4 accent-black" aria-label="Default colour">
+            <button type="button" class="grid size-10 place-items-center rounded-md text-ash hover:bg-white hover:text-crimson" data-remove-row aria-label="Remove">✕</button>
+          </div>
+        </template>
+        <button type="button" class="mt-3 text-sm font-medium text-ash hover:text-ink" data-add-row="colours">+ Add a colour</button>
+      </section>
+    </div>
+
+    <!--/* Right column */-->
+    <div class="flex flex-col gap-5">
+      <section class="rounded-lg bg-neutral-50 p-5">
+        <h3 class="font-semibold">Category</h3>
+        <label class="mb-1.5 mt-4 block text-sm font-medium" for="category">Category *</label>
+        <select id="category" name="category" class="field bg-white" data-category>
+          <option th:each="c : ${categories}" th:value="${c.slug}" th:text="${c.name}" th:selected="${form.category == c.slug}">Men</option>
+        </select>
+        <label class="mb-1.5 mt-4 block text-sm font-medium" for="subCategory">Type *</label>
+        <select id="subCategory" name="subCategory" class="field bg-white" data-subcategory>
+          <th:block th:each="c : ${categories}">
+            <option th:each="s : ${c.subCategories}" th:value="${s.slug}" th:text="${s.name}" th:attr="data-for=${c.slug}"
+                    th:selected="${form.category == c.slug and form.subCategory == s.slug}">Topwear</option>
+          </th:block>
+        </select>
+      </section>
+
+      <section class="rounded-lg bg-neutral-50 p-5">
+        <h3 class="font-semibold">Price and status</h3>
+        <div class="mt-4 grid grid-cols-2 gap-3">
+          <div><label class="mb-1.5 block text-sm font-medium" for="basePrice">Price ($) *</label>
+            <input id="basePrice" name="basePrice" type="number" min="0" step="0.01" th:value="${form.basePrice}" required class="field bg-white"></div>
+          <div><label class="mb-1.5 block text-sm font-medium" for="discountPercent">Discount %</label>
+            <input id="discountPercent" name="discountPercent" type="number" min="0" max="90" th:value="${form.discountPercent}" class="field bg-white"></div>
+        </div>
+        <label class="mb-1.5 mt-4 block text-sm font-medium" for="status">Status</label>
+        <select id="status" name="status" class="field bg-white">
+          <option th:each="st : ${statuses}" th:value="${st}" th:text="${@fmt.label(st)}" th:selected="${form.status == st}">Live</option>
+        </select>
+        <p class="mt-1 text-xs text-ash">Only Live and Sold out show in the shop.</p>
+        <label class="mt-4 flex items-center gap-2 text-sm"><input type="checkbox" name="newArrival" th:checked="${form.newArrival}" class="size-4 accent-black"> Show in the New tab</label>
+        <label class="mt-2 flex items-center gap-2 text-sm"><input type="checkbox" name="bestSeller" th:checked="${form.bestSeller}" class="size-4 accent-black"> Best seller</label>
+        <label class="mb-1.5 mt-4 block text-sm font-medium" for="tags">Tags <span class="font-normal text-ash">(comma separated)</span></label>
+        <input id="tags" name="tags" th:value="${form.tags}" class="field bg-white" placeholder="merino, travel">
+      </section>
+
+      <button class="btn btn-dark w-full" th:text="${editing} ? 'Save changes' : 'Create product'">Save</button>
+    </div>
+  </form>
+
+  <!--/* Photos (after the product exists) */-->
+  <section id="photos" class="mt-5 rounded-lg bg-neutral-50 p-5">
+    <h3 class="font-semibold">Photos</h3>
+    <p th:unless="${editing}" class="mt-2 text-sm text-ash">Create the product first, then add its photos here.</p>
+    <th:block th:if="${editing}">
+      <p class="mt-1 text-xs text-ash">JPG, PNG, WebP or AVIF, up to 8 MB each. The first photo is the cover; the second shows when shoppers hover.</p>
+      <div class="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-6">
+        <div th:each="img, i : ${product.images}" class="group relative aspect-[3/4] overflow-hidden rounded-md bg-white">
+          <img th:src="${img}" alt="" class="size-full object-cover">
+          <span th:if="${i.index == 0}" class="absolute left-2 top-2 rounded bg-ink px-1.5 py-0.5 text-[10px] font-semibold text-white">Cover</span>
+          <div class="absolute inset-x-2 bottom-2 flex gap-1 opacity-0 transition group-hover:opacity-100">
+            <form th:if="${i.index > 0}" th:action="@{/admin/products/{id}/images/cover(id=${product.id})}" method="post" class="flex-1">
+              <input type="hidden" name="url" th:value="${img}">
+              <button class="w-full rounded bg-white/95 px-2 py-1 text-[11px] font-medium hover:bg-white">Make cover</button>
+            </form>
+            <form th:action="@{/admin/products/{id}/images/remove(id=${product.id})}" method="post" data-confirm="Remove this photo?">
+              <input type="hidden" name="url" th:value="${img}">
+              <button class="rounded bg-white/95 px-2 py-1 text-[11px] font-medium text-crimson hover:bg-white">Remove</button>
+            </form>
+          </div>
+        </div>
+        <form th:if="${product.images.size() < 12}" th:action="@{/admin/products/{id}/images(id=${product.id})}" method="post" enctype="multipart/form-data"
+              class="relative grid aspect-[3/4] place-items-center rounded-md bg-white text-center text-xs text-ash hover:bg-neutral-100">
+          <input type="file" name="files" accept="image/jpeg,image/png,image/webp,image/avif" multiple required
+                 class="absolute inset-0 cursor-pointer opacity-0" onchange="this.form.requestSubmit()" aria-label="Add photos">
+          <span class="flex flex-col items-center gap-2"><svg th:replace="~{fragments/icons :: icon('upload', 'size-5')}"></svg> Add photos</span>
+        </form>
+      </div>
+    </th:block>
+  </section>
+
+  <!--/* Delete */-->
+  <section th:if="${editing}" class="mt-5 flex flex-wrap items-center justify-between gap-3 rounded-lg bg-rose-50/60 p-5">
+    <div><h3 class="font-semibold">Delete this product</h3><p class="text-sm text-ash">Removes it, its reviews and its photos, and takes it out of bags and wishlists. Old orders keep their copy.</p></div>
+    <form th:action="@{/admin/products/{id}/delete(id=${product.id})}" method="post" th:attr="data-confirm=|Delete ${product.name}? This cannot be undone.|">
+      <button class="btn btn-sm bg-crimson text-white hover:bg-crimson-dark">Delete product</button>
+    </form>
+  </section>
+</div>
+</body>
+</html>

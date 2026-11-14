@@ -1,9 +1,9 @@
-# Creates the vela_noire database and the vela_app user.
+# Creates the luxuryshop database and the luxury_app user.
 # Run ONCE from the project root:   powershell -ExecutionPolicy Bypass -File database\mysql\setup.ps1
 #
 # It asks for the MySQL ROOT password (hidden as you type). Root is only used here, to
-# create the app user. The app itself always connects as vela_app, which can only touch
-# the vela_noire database. Safe to run again: it updates the password instead of failing.
+# create the app user. The app itself always connects as luxury_app, which can only touch
+# the luxuryshop database. Safe to run again: it updates the password instead of failing.
 
 $ErrorActionPreference = "Stop"
 $root = Resolve-Path "$PSScriptRoot\..\.."

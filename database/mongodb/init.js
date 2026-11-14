@@ -1,5 +1,5 @@
 // =============================================================================
-//  Vela Noire: MongoDB setup (the "menu album")
+//  LuxuryShop: MongoDB setup (the "menu album")
 // =============================================================================
 //  Creates every collection with its $jsonSchema validator (the house rules,
 //  in ./schemas) and its indexes (the album's index pages).
@@ -7,17 +7,19 @@
 //  Run from the project root:   mongosh --file database/mongodb/init.js
 //  ⚠ This RESETS the album: existing collections are dropped and recreated.
 //
-//  Database name: MONGODB_DATABASE env var, default "vela_noire".
+//  Database name: MONGODB_DATABASE env var, default "luxuryshop".
 // =============================================================================
 
 const fs = require("fs");
 const path = require("path");
 
-const dbName = process.env.MONGODB_DATABASE || "vela_noire";
+const dbName = process.env.MONGODB_DATABASE || "luxuryshop";
 const target = db.getSiblingDB(dbName);
 const schemaDir = path.join(__dirname, "schemas");
 
-const collections = ["categories", "collections", "products", "brand_models", "reviews", "clickstream_events"];
+const collections = ["categories", "products", "reviews", "clickstream_events"];
+// Leftovers from the old catalogue, removed if they exist
+for (const old of ["collections", "brand_models"]) if (target.getCollectionNames().includes(old)) target.getCollection(old).drop();
 
 print(`\nSetting up MongoDB database "${dbName}"\n`);
 
@@ -33,17 +35,16 @@ for (const name of collections) {
 }
 
 // --- Indexes -----------------------------------------------------------------
-// categories / collections / brand models: looked up by slug in URLs
+// categories: looked up by slug in URLs
 target.categories.createIndex({ slug: 1 }, { unique: true, name: "uq_slug" });
 target.categories.createIndex({ displayOrder: 1 }, { name: "ix_display_order" });
-target.collections.createIndex({ slug: 1 }, { unique: true, name: "uq_slug" });
-target.brand_models.createIndex({ slug: 1 }, { unique: true, name: "uq_slug" });
 
 // products
 target.products.createIndex({ slug: 1 }, { unique: true, name: "uq_slug" });
 target.products.createIndex({ "variants.sku": 1 }, { unique: true, name: "uq_variant_sku" });
 target.products.createIndex({ category: 1, status: 1, basePrice: 1 }, { name: "ix_browse_category_price" });
-target.products.createIndex({ collection: 1, season: 1 }, { name: "ix_collection_season" });
+target.products.createIndex({ category: 1, subCategory: 1 }, { name: "ix_category_sub" });
+target.products.createIndex({ isNew: 1, createdAt: -1 }, { name: "ix_new" });
 target.products.createIndex({ tags: 1 }, { name: "ix_tags" });
 target.products.createIndex(
   { name: "text", description: "text", tags: "text" },

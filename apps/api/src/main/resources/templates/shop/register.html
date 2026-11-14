@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head><th:block th:replace="~{fragments/layout :: head('Register')}"></th:block></head>
+<body class="scrollbar-pill">
+<header th:replace="~{fragments/shop :: header}"></header>
+
+<main class="mx-auto max-w-xl px-4 pt-14">
+  <h1 class="display text-5xl">Sign up</h1>
+  <p class="mt-1 text-sm text-ash">Create your LuxuryShop account to save favourites and check out faster.</p>
+
+  <div th:if="${error}" class="mt-6 flex items-start gap-3 rounded-md bg-rose-50 p-4 text-sm text-rose-800" role="alert">
+    <svg th:replace="~{fragments/icons :: icon('alert', 'size-5 shrink-0')}"></svg><span th:text="${error}">…</span>
+  </div>
+
+  <form th:action="@{/register}" method="post" class="mt-6 grid gap-5 sm:grid-cols-2">
+    <div class="sm:col-span-2">
+      <label class="label" for="name">Full name *</label>
+      <input id="name" name="name" th:value="${form.name}" required maxlength="120" autocomplete="name" class="field h-12">
+    </div>
+    <div class="sm:col-span-2">
+      <label class="label" for="email">Email address *</label>
+      <input id="email" name="email" type="email" th:value="${form.email}" required maxlength="255" autocomplete="email" class="field h-12">
+    </div>
+    <div class="sm:col-span-2">
+      <label class="label" for="password">Password * <span class="normal-case tracking-normal">(8 or more characters)</span></label>
+      <input id="password" name="password" type="password" required minlength="8" maxlength="72" autocomplete="new-password" class="field h-12">
+    </div>
+    <div>
+      <label class="label" for="country">Country</label>
+      <input id="country" name="country" th:value="${form.country}" maxlength="60" autocomplete="country-name" class="field">
+    </div>
+    <div>
+      <label class="label" for="city">City</label>
+      <input id="city" name="city" th:value="${form.city}" maxlength="80" autocomplete="address-level2" class="field">
+    </div>
+    <div>
+      <label class="label" for="gender">Gender</label>
+      <select id="gender" name="gender" class="field">
+        <option value="">Prefer not to say</option>
+        <option value="FEMALE" th:selected="${form.gender?.name() == 'FEMALE'}">Female</option>
+        <option value="MALE" th:selected="${form.gender?.name() == 'MALE'}">Male</option>
+        <option value="OTHER" th:selected="${form.gender?.name() == 'OTHER'}">Other</option>
+      </select>
+    </div>
+    <div>
+      <label class="label" for="dateOfBirth">Date of birth</label>
+      <input id="dateOfBirth" name="dateOfBirth" type="date" th:value="${form.dateOfBirth}" class="field">
+    </div>
+    <button type="submit" class="btn btn-dark h-12 text-base sm:col-span-2">Create an account</button>
+  </form>
+  <p class="mt-6 text-sm text-ash">Already have an account? <a th:href="@{/login}" class="font-semibold text-ink underline underline-offset-4 hover:text-crimson">Log in</a></p>
+</main>
+
+<footer th:replace="~{fragments/shop :: footer}"></footer>
+<th:block th:replace="~{fragments/layout :: feedback}"></th:block>
+<script th:src="@{/js/shop.js}"></script>
+</body>
+</html>

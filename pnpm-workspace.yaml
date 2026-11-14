@@ -1,8 +1,10 @@
-packages:
-  - apps/shop
-  - apps/admin
+# No JavaScript apps any more: the shop and admin pages are served by Spring Boot
+# (apps/api, Thymeleaf). The root package.json only holds dev tools: the Tailwind CLI
+# (builds the CSS) and concurrently (runs the CSS watcher and Java together).
+packages: []
 
-# sharp and unrs-resolver ship prebuilt binaries, so their install scripts are not needed
+# These ship prebuilt binaries, so their install scripts are not needed
 allowBuilds:
+  "@parcel/watcher": false
   sharp: false
   unrs-resolver: false

@@ -1,0 +1,202 @@
+<!--/*
+  The shop frame, rebuilt from the Under-Armour project:
+  header (black top strip + white navbar + mobile menu), footer, product card, empty state.
+*/-->
+
+<!--/* ============================== HEADER ============================== */-->
+<header th:fragment="header" class="sticky top-0 z-40 bg-white">
+  <!--/* Black top strip */-->
+  <div class="bg-ink text-white">
+    <div class="mx-auto grid h-9 max-w-7xl grid-cols-[1fr_auto] items-center px-4 text-xs md:grid-cols-[1fr_auto_1fr] md:px-6">
+      <div class="hidden md:block"></div>
+      <p class="truncate font-semibold underline underline-offset-4">Free shipping on orders over $75 &amp; free 30-day returns</p>
+      <div class="flex items-center justify-end gap-4">
+        <a href="#footer-help" class="hidden text-white/80 hover:text-white md:inline">Need help?</a>
+        <span class="hidden text-white/80 md:inline">English</span>
+        <th:block th:if="${me == null}">
+          <a th:href="@{/register}" class="hidden hover:underline sm:inline">Register</a>
+          <span class="hidden h-3 w-px bg-white/40 sm:inline-block"></span>
+          <a th:href="@{/login}" class="hover:underline">Log in</a>
+        </th:block>
+        <div th:if="${me != null}" class="relative" data-dropdown>
+          <button type="button" data-dropdown-toggle class="flex items-center gap-1.5 hover:text-white/80" aria-haspopup="menu">
+            <span class="grid size-6 place-items-center rounded-full bg-white text-[10px] font-bold text-ink" th:text="${@fmt.initials(me.name)}">AH</span>
+            <span class="hidden sm:inline" th:text="${#strings.arraySplit(me.name, ' ')[0]}">Amira</span>
+            <svg th:replace="~{fragments/icons :: icon('chevron-down', 'size-3.5')}"></svg>
+          </button>
+          <div data-dropdown-menu hidden class="absolute right-0 top-8 z-50 w-48 overflow-hidden rounded-md bg-white py-1 text-sm text-ink shadow-xl">
+            <a th:href="@{/account}" class="block px-4 py-2 hover:bg-mist">Your account</a>
+            <a th:href="@{/account/orders}" class="block px-4 py-2 hover:bg-mist">My orders</a>
+            <a th:href="@{/liked}" class="block px-4 py-2 hover:bg-mist">Liked items</a>
+            <form th:action="@{/logout}" method="post">
+              <button type="submit" class="block w-full px-4 py-2 text-left hover:bg-mist">Log out</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!--/* White navbar */-->
+  <nav class="mx-auto flex h-16 max-w-7xl items-center gap-6 px-4 md:px-6" aria-label="Main">
+    <a th:href="@{/}" aria-label="LuxuryShop home" class="shrink-0">
+      <span th:replace="~{fragments/layout :: wordmark('text-[1.75rem] text-ink')}"></span>
+    </a>
+
+    <ul class="hidden items-center gap-6 text-[15px] font-medium lg:flex">
+      <li><a th:href="@{/categories/new}" th:classappend="${path == '/categories/new'} ? 'text-crimson' : 'hover:text-crimson'">New</a></li>
+      <li th:each="c : ${navCategories}">
+        <a th:href="@{/categories/{s}(s=${c.slug})}" th:text="${c.name}"
+           th:classappend="${#strings.startsWith(path, '/categories/' + c.slug)} ? 'text-crimson' : 'hover:text-crimson'">Men</a>
+      </li>
+    </ul>
+
+    <div class="ml-auto flex items-center gap-3">
+      <form th:action="@{/search}" method="get" role="search" class="relative hidden md:block">
+        <input name="q" type="search" th:value="${q}" placeholder="Search LuxuryShop" aria-label="Search products"
+               class="h-10 w-56 rounded-full bg-mist pl-4 pr-10 text-sm outline-none transition focus:w-72 focus:ring-2 focus:ring-ink/70 xl:w-64">
+        <button type="submit" class="absolute right-3 top-1/2 -translate-y-1/2 text-ash" aria-label="Search">
+          <svg th:replace="~{fragments/icons :: icon('search', 'size-4.5')}"></svg>
+        </button>
+      </form>
+      <a th:href="@{/liked}" class="grid size-10 place-items-center rounded-full hover:bg-mist" aria-label="Liked items">
+        <svg th:replace="~{fragments/icons :: icon('heart', 'size-5.5')}"></svg>
+      </a>
+      <a th:href="@{/cart}" class="relative grid size-10 place-items-center rounded-full hover:bg-mist" aria-label="Your bag">
+        <svg th:replace="~{fragments/icons :: icon('bag', 'size-5.5')}"></svg>
+        <span data-bag-count th:text="${bagCount}" th:hidden="${bagCount == null or bagCount == 0}"
+              class="absolute right-0.5 top-0.5 grid min-w-4.5 place-items-center rounded-full bg-crimson px-1 text-[10px] font-bold leading-4.5 text-white">0</span>
+      </a>
+      <button type="button" class="grid size-10 place-items-center rounded-full hover:bg-mist lg:hidden" data-menu-open aria-label="Open menu">
+        <svg th:replace="~{fragments/icons :: icon('menu', 'size-6')}"></svg>
+      </button>
+    </div>
+  </nav>
+
+  <!--/* Mobile slide-in menu (closes when you click outside it) */-->
+  <div data-menu hidden class="fixed inset-0 z-50 lg:hidden">
+    <div class="absolute inset-0 bg-black/40" data-menu-close></div>
+    <aside class="absolute inset-y-0 left-0 flex w-80 max-w-[85vw] flex-col gap-6 bg-white p-6 shadow-2xl" data-menu-panel>
+      <div class="flex items-center justify-between">
+        <span th:replace="~{fragments/layout :: wordmark('text-2xl')}"></span>
+        <button type="button" data-menu-close class="grid size-9 place-items-center rounded-full hover:bg-mist" aria-label="Close menu">
+          <svg th:replace="~{fragments/icons :: icon('x', 'size-5')}"></svg>
+        </button>
+      </div>
+      <form th:action="@{/search}" method="get" role="search">
+        <input name="q" type="search" placeholder="Search LuxuryShop" class="field" aria-label="Search products">
+      </form>
+      <ul class="flex flex-col gap-1 text-lg font-medium">
+        <li><a th:href="@{/categories/new}" class="block rounded-md px-2 py-2 hover:bg-mist">New</a></li>
+        <li th:each="c : ${navCategories}"><a th:href="@{/categories/{s}(s=${c.slug})}" th:text="${c.name}" class="block rounded-md px-2 py-2 hover:bg-mist">Men</a></li>
+      </ul>
+      <div class="mt-auto flex gap-3 text-sm" th:if="${me == null}">
+        <a th:href="@{/login}" class="btn btn-dark flex-1">Log in</a>
+        <a th:href="@{/register}" class="btn btn-light flex-1">Register</a>
+      </div>
+      <div class="mt-auto flex flex-col gap-1 text-sm" th:if="${me != null}">
+        <a th:href="@{/account}" class="rounded-md px-2 py-2 hover:bg-mist">Your account</a>
+        <a th:href="@{/account/orders}" class="rounded-md px-2 py-2 hover:bg-mist">My orders</a>
+        <form th:action="@{/logout}" method="post"><button class="w-full rounded-md px-2 py-2 text-left hover:bg-mist">Log out</button></form>
+      </div>
+    </aside>
+  </div>
+</header>
+
+<!--/* ============================== FOOTER ============================== */-->
+<footer th:fragment="footer" class="mt-24 bg-ink text-white" id="footer-help">
+  <div class="mx-auto grid max-w-7xl gap-12 px-4 py-14 md:px-6 lg:grid-cols-[1fr_1.6fr]">
+    <div class="flex flex-col gap-5">
+      <span th:replace="~{fragments/layout :: wordmark('text-4xl')}"></span>
+      <p class="display text-2xl">Stay in the loop</p>
+      <form class="flex max-w-md gap-2" data-newsletter>
+        <input type="email" required placeholder="Email address" aria-label="Email address"
+               class="h-11 flex-1 rounded-md bg-white/10 px-4 text-sm text-white outline-none placeholder:text-white/50 focus:ring-2 focus:ring-white/60">
+        <button class="btn bg-white text-ink hover:bg-white/90">Submit</button>
+      </form>
+      <p class="max-w-md text-xs leading-relaxed text-white/60">By giving your email you agree to our Terms &amp; Conditions and Privacy Policy. You can unsubscribe at any time.</p>
+      <div>
+        <p class="mb-2 text-xs text-white/70">Accepted payment methods</p>
+        <div class="flex gap-2">
+          <img th:src="@{/img/pay/mastercard.svg}" alt="Mastercard" class="h-9 w-auto">
+          <img th:src="@{/img/pay/unionpay.svg}" alt="UnionPay" class="h-9 w-auto">
+          <img th:src="@{/img/pay/amex.svg}" alt="American Express" class="h-9 w-auto">
+          <img th:src="@{/img/pay/visa.svg}" alt="Visa" class="h-9 w-auto">
+        </div>
+      </div>
+    </div>
+    <div class="grid grid-cols-2 gap-8 text-sm sm:grid-cols-4">
+      <div class="flex flex-col gap-2.5">
+        <h4 class="display mb-1 text-xl">Help</h4>
+        <a href="#" class="text-white/70 hover:text-white">Help &amp; FAQ</a>
+        <a href="#" class="text-white/70 hover:text-white">Contact us</a>
+        <a href="#" class="text-white/70 hover:text-white">Shipping &amp; delivery</a>
+        <a href="#" class="text-white/70 hover:text-white">Returns</a>
+      </div>
+      <div class="flex flex-col gap-2.5">
+        <h4 class="display mb-1 text-xl">Customer service</h4>
+        <a th:href="@{/account/orders}" class="text-white/70 hover:text-white">Order tracking</a>
+        <a href="#" class="text-white/70 hover:text-white">Size guide</a>
+        <a th:href="@{/account}" class="text-white/70 hover:text-white">Your account</a>
+      </div>
+      <div class="flex flex-col gap-2.5">
+        <h4 class="display mb-1 text-xl">About LuxuryShop</h4>
+        <a href="#" class="text-white/70 hover:text-white">Our story</a>
+        <a href="#" class="text-white/70 hover:text-white">Materials</a>
+        <a href="#" class="text-white/70 hover:text-white">Careers</a>
+      </div>
+      <div class="flex flex-col gap-2.5">
+        <h4 class="display mb-1 text-xl">Follow us</h4>
+        <a href="#" class="flex items-center gap-2 text-white/70 hover:text-white"><svg th:replace="~{fragments/icons :: icon('instagram', 'size-4')}"></svg> Instagram</a>
+        <a href="#" class="flex items-center gap-2 text-white/70 hover:text-white"><svg th:replace="~{fragments/icons :: icon('youtube', 'size-4')}"></svg> YouTube</a>
+        <a href="#" class="flex items-center gap-2 text-white/70 hover:text-white"><svg th:replace="~{fragments/icons :: icon('facebook', 'size-4')}"></svg> Facebook</a>
+      </div>
+    </div>
+  </div>
+  <div class="mx-auto max-w-7xl px-4 pb-8 text-xs text-white/50 md:px-6">© 2026 LuxuryShop. A student capstone project; all products are invented.</div>
+</footer>
+
+<!--/* ============================== PRODUCT CARD ============================== */-->
+<!--/* p = ProductSummary, liked = the set of liked product ids */-->
+<article th:fragment="card(p, liked)" class="group relative">
+  <a th:href="@{/product/{s}(s=${p.slug})}" class="block">
+    <div class="relative aspect-[3/4] overflow-hidden rounded-md bg-mist">
+      <th:block th:if="${p.image != null}">
+        <img th:src="${p.image}" th:alt="${p.name}" loading="lazy"
+             class="absolute inset-0 size-full object-cover transition duration-500 group-hover:scale-[1.03]"
+             th:classappend="${p.hoverImage != null} ? 'group-hover:opacity-0'">
+        <img th:if="${p.hoverImage != null}" th:src="${p.hoverImage}" alt="" loading="lazy" aria-hidden="true"
+             class="absolute inset-0 size-full object-cover opacity-0 transition duration-500 group-hover:opacity-100">
+      </th:block>
+      <div th:if="${p.image == null}" class="photo-box absolute inset-0">
+        <svg th:replace="~{fragments/icons :: icon('image', 'size-8')}"></svg>
+      </div>
+      <span th:if="${p.isNew}" class="absolute left-2.5 top-2.5 flex items-center gap-1 rounded-sm bg-white px-2 py-1 text-[11px] font-bold tracking-wide text-crimson">
+        <svg th:replace="~{fragments/icons :: icon('flame', 'size-3.5')}"></svg> NEW
+      </span>
+      <span th:if="${!p.inStock}" class="absolute bottom-2.5 left-2.5 rounded-sm bg-ink px-2 py-1 text-[11px] font-semibold text-white">Sold out</span>
+    </div>
+    <div class="mt-3 flex items-start justify-between gap-3">
+      <p class="text-sm font-medium leading-snug" th:text="${p.name}">Men's Aero Knit Tee</p>
+      <p class="shrink-0 text-sm font-semibold" th:text="${@fmt.price(p.finalPrice)}">$120</p>
+    </div>
+    <div class="mt-2 flex items-center gap-1.5" th:if="${p.colors.size() > 1}">
+      <span th:each="c : ${p.colors}" class="size-3 rounded-full ring-1 ring-black/10" th:style="|background:${c.hex}|" th:title="${c.name}"></span>
+      <span class="ml-1 text-xs text-ash" th:text="|${p.colors.size()} colours|">3 colours</span>
+    </div>
+  </a>
+  <button type="button" th:attr="data-like=${p.id},aria-pressed=${liked.contains(p.id)}"
+          class="absolute right-2.5 top-2.5 grid size-9 place-items-center rounded-full bg-white/90 text-ink shadow-sm transition hover:scale-105"
+          th:classappend="${liked.contains(p.id)} ? 'is-liked'" aria-label="Like">
+    <svg th:replace="~{fragments/icons :: icon('heart', 'size-4.5')}"></svg>
+  </button>
+</article>
+
+<!--/* ============================== EMPTY STATE ============================== */-->
+<div th:fragment="empty(icon, title, text)" class="mx-auto flex max-w-md flex-col items-center gap-3 py-20 text-center">
+  <div class="grid size-14 place-items-center rounded-full bg-mist text-ash">
+    <svg th:replace="~{fragments/icons :: icon(${icon}, 'size-6')}"></svg>
+  </div>
+  <h2 class="display text-3xl" th:text="${title}">Nothing here yet</h2>
+  <p class="text-sm text-ash" th:text="${text}">…</p>
+</div>

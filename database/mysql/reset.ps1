@@ -1,8 +1,8 @@
-# Rebuilds the vela_noire tables and loads the sample data, as the app user.
+# Rebuilds the luxuryshop tables and loads the sample data, as the app user.
 # Run from the project root:   powershell -ExecutionPolicy Bypass -File database\mysql\reset.ps1
 #
-# ⚠ This DELETES all rows in vela_noire and starts fresh (schema.sql drops every table).
-# Needs setup.ps1 to have been run once first (it creates the database and vela_app).
+# ⚠ This DELETES all rows in luxuryshop and starts fresh (schema.sql drops every table).
+# Needs setup.ps1 to have been run once first (it creates the database and luxury_app).
 
 $ErrorActionPreference = "Stop"
 $root = Resolve-Path "$PSScriptRoot\..\.."
@@ -28,4 +28,4 @@ try {
 } finally {
   Remove-Item Env:\MYSQL_PWD -ErrorAction SilentlyContinue
 }
-Write-Host "Done: vela_noire rebuilt with sample data." -ForegroundColor Green
+Write-Host "Done: luxuryshop rebuilt with sample data." -ForegroundColor Green

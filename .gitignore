@@ -22,3 +22,7 @@ __pycache__/
 .DS_Store
 Thumbs.db
 *.log
+
+# Uploaded product photos (the admin adds these; they are not part of the code)
+apps/api/uploads/
+uploads/

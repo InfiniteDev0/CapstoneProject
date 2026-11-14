@@ -1,0 +1,45 @@
+<!--/* Bits every page shares: <head>, the wordmark, the toast host and the loading bar. */-->
+
+<!--/* <head> contents. title = the page name ("Men", "Checkout"...) */-->
+<th:block th:fragment="head(title)">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <!--/* The design is white: ask the Dark Reader extension not to repaint it */-->
+  <meta name="darkreader-lock">
+  <title th:text="${title} ? ${title} + ' · LuxuryShop' : 'LuxuryShop · Premium Activewear & Fashion'">LuxuryShop</title>
+  <meta name="description" content="LuxuryShop: premium activewear and fashion for men and women, plus running, training and lifestyle shoes.">
+  <!--/* CSRF token for the small fetch() calls (forms get it automatically) */-->
+  <meta name="_csrf" th:content="${_csrf?.token}">
+  <meta name="_csrf_header" th:content="${_csrf?.headerName}">
+  <link rel="icon" type="image/svg+xml" th:href="@{/favicon.svg}">
+  <link rel="stylesheet" th:href="@{/css/app.css}">
+</th:block>
+
+<!--/* The LuxuryShop wordmark (black and white). cls sets size and colour. */-->
+<span th:fragment="wordmark(cls)" th:class="'display select-none ' + ${cls}">LUXURY<span class="mx-[0.08em] inline-block h-[0.12em] w-[0.12em] translate-y-[-0.28em] rounded-full bg-current"></span>SHOP</span>
+
+<!--/* Toast host + the message a redirect left behind (flash) + the loading bar */-->
+<th:block th:fragment="feedback">
+  <div id="loadbar" aria-hidden="true"></div>
+  <div id="toasts" role="status" aria-live="polite"></div>
+  <template id="flash" th:if="${toast}" th:attr="data-type=${toastType} ?: 'success',data-message=${toast}"></template>
+  <script th:src="@{/js/toast.js}"></script>
+  <script th:src="@{/js/app.js}"></script>
+</th:block>
+
+<!--/* An empty photo box with a small icon: shown until the admin uploads photos */-->
+<div th:fragment="photoBox(cls)" th:class="'photo-box ' + ${cls}">
+  <svg th:replace="~{fragments/icons :: icon('image', 'size-8')}"></svg>
+</div>
+
+<!--/* Pager: prev / page x of y / next. Keeps the other filters in the URL. */-->
+<nav th:fragment="pager(results)" th:if="${results.totalPages > 1}" class="mt-10 flex items-center justify-center gap-2 text-sm" aria-label="Pages">
+  <a th:if="${results.page > 0}" th:with="u=${@fmt.pageUrl(results.page - 1)}" th:href="${u}" class="btn btn-light btn-sm">
+    <svg th:replace="~{fragments/icons :: icon('chevron-left', 'size-4')}"></svg> Previous
+  </a>
+  <span class="px-3 text-ash" th:text="|Page ${results.page + 1} of ${results.totalPages}|">Page 1 of 3</span>
+  <a th:if="${results.page + 1 < results.totalPages}" th:with="u=${@fmt.pageUrl(results.page + 1)}" th:href="${u}" class="btn btn-light btn-sm">
+    Next <svg th:replace="~{fragments/icons :: icon('chevron-right', 'size-4')}"></svg>
+  </a>
+</nav>

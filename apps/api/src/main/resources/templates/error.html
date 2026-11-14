@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<!--/* Used for every page error: 404, 403, 500, and problems a page reports (e.g. "No product called x").
+       Spring Boot passes status/error; WebErrorAdvice passes status/title/message. */-->
+<head><th:block th:replace="~{fragments/layout :: head(${title} ?: 'Something went wrong')}"></th:block></head>
+<body class="flex min-h-screen flex-col bg-white">
+<header class="mx-auto flex h-16 w-full max-w-7xl items-center px-4 md:px-6">
+  <a href="/" aria-label="LuxuryShop home"><span th:replace="~{fragments/layout :: wordmark('text-[1.75rem]')}"></span></a>
+</header>
+<main class="mx-auto flex max-w-lg flex-1 flex-col items-center justify-center px-4 pb-24 text-center"
+      th:with="code=${status} ?: 500">
+  <p class="display text-8xl text-crimson" th:text="${code}">404</p>
+  <h1 class="display mt-2 text-4xl"
+      th:text="${title} ?: (${code == 404} ? 'Page not found' : (${code == 403} ? 'Not allowed' : 'Something went wrong'))">Page not found</h1>
+  <p class="mt-3 text-ash"
+     th:text="${message} ?: (${code == 404} ? 'The page you wanted has moved or never existed.' : (${code == 403} ? 'You do not have access to this page. Try logging in with another account.' : 'Please try again in a moment. If it keeps happening, contact us.'))">…</p>
+  <div class="mt-8 flex flex-wrap justify-center gap-3">
+    <a href="/" class="btn btn-dark">Back to the shop</a>
+    <a href="javascript:history.back()" class="btn btn-light">Go back</a>
+  </div>
+</main>
+</body>
+</html>

@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head><th:block th:replace="~{fragments/layout :: head('Your account')}"></th:block></head>
+<body class="scrollbar-pill">
+<header th:replace="~{fragments/shop :: header}"></header>
+
+<main class="mx-auto max-w-7xl px-4 pt-10 md:px-6" th:with="p=${profile}">
+  <h1 class="display text-5xl md:text-6xl">Your LuxuryShop profile</h1>
+
+  <div class="mt-8 grid gap-8 lg:grid-cols-[1fr_24rem]">
+    <!--/* Left: who you are + edit */-->
+    <section class="flex flex-col gap-6">
+      <div class="flex flex-col gap-6 rounded-md bg-mist p-6 sm:flex-row sm:items-center">
+        <div class="grid size-24 shrink-0 place-items-center rounded-full bg-ink font-display text-4xl text-white" th:text="${@fmt.initials(p.name)}">AH</div>
+        <div class="min-w-0 flex-1">
+          <p class="display text-3xl" th:text="${p.name}">Amira Hassan</p>
+          <p class="text-sm text-ash" th:text="${p.email}">amira@luxuryshop.local</p>
+          <p class="mt-1 text-sm text-ash" th:text="|Member since ${@fmt.date(p.createdAt)} · ${p.tenureDays} days|">Member since…</p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <div class="rounded-md bg-mist p-4"><p class="text-xs text-ash">Orders</p><p class="display mt-1 text-3xl" th:text="${p.orderCount}">3</p></div>
+        <div class="rounded-md bg-mist p-4"><p class="text-xs text-ash">Total spent</p><p class="display mt-1 text-3xl" th:text="${@fmt.price(p.totalSpent)}">$1,555</p></div>
+        <div class="rounded-md bg-mist p-4"><p class="text-xs text-ash">Devices</p><p class="display mt-1 text-3xl" th:text="${p.deviceCount}">2</p></div>
+        <div class="rounded-md bg-mist p-4"><p class="text-xs text-ash">Last visit</p><p class="mt-2 text-sm font-semibold" th:text="${@fmt.ago(p.lastLoginAt)}">today</p></div>
+      </div>
+
+      <details class="group rounded-md bg-mist p-6" th:open="${p.phone == null and p.city == null}">
+        <summary class="flex cursor-pointer list-none items-center justify-between">
+          <span class="display text-2xl">Edit profile</span>
+          <svg th:replace="~{fragments/icons :: icon('chevron-down', 'size-5 transition group-open:rotate-180')}"></svg>
+        </summary>
+        <form th:action="@{/account}" method="post" class="mt-5 grid gap-4 sm:grid-cols-2">
+          <div><label class="label" for="name">Name</label><input id="name" name="name" th:value="${p.name}" required maxlength="120" class="field bg-white"></div>
+          <div><label class="label" for="phone">Phone</label><input id="phone" name="phone" th:value="${p.phone}" maxlength="30" class="field bg-white"></div>
+          <div><label class="label" for="country">Country</label><input id="country" name="country" th:value="${p.country}" maxlength="60" class="field bg-white"></div>
+          <div><label class="label" for="city">City</label><input id="city" name="city" th:value="${p.city}" maxlength="80" class="field bg-white"></div>
+          <div>
+            <label class="label" for="gender">Gender</label>
+            <select id="gender" name="gender" class="field bg-white">
+              <option value="">Prefer not to say</option>
+              <option th:each="g : ${genders}" th:value="${g}" th:text="${@fmt.label(g)}" th:selected="${p.gender == g}">Female</option>
+            </select>
+          </div>
+          <div><label class="label" for="dateOfBirth">Date of birth</label><input id="dateOfBirth" name="dateOfBirth" type="date" th:value="${p.dateOfBirth}" class="field bg-white"></div>
+          <fieldset class="sm:col-span-2">
+            <legend class="label">I mostly shop for</legend>
+            <div class="flex flex-wrap gap-2">
+              <label th:each="c : ${navCategories}" class="cursor-pointer">
+                <input type="checkbox" name="preferredCategories" class="peer sr-only" th:value="${c.slug}" th:checked="${p.preferredCategories.contains(c.slug)}">
+                <span class="block rounded-full bg-white px-4 py-2 text-sm font-medium transition peer-checked:bg-ink peer-checked:text-white" th:text="${c.name}">Men</span>
+              </label>
+            </div>
+          </fieldset>
+          <div class="sm:col-span-2"><button class="btn btn-dark">Save profile</button></div>
+        </form>
+      </details>
+
+      <div class="rounded-md bg-mist p-6">
+        <div class="flex items-center justify-between">
+          <p class="display text-2xl">Recent orders</p>
+          <a th:href="@{/account/orders}" class="text-sm underline underline-offset-4 hover:text-crimson">All orders</a>
+        </div>
+        <p th:if="${recentOrders.isEmpty()}" class="mt-3 text-sm text-ash">No orders yet.</p>
+        <ul class="mt-3 flex flex-col">
+          <li th:each="o : ${recentOrders}">
+            <a th:href="@{/account/orders/{id}(id=${o.id})}" class="flex items-center justify-between gap-3 rounded-md px-2 py-3 hover:bg-white">
+              <span><span class="font-semibold" th:text="${o.orderNumber}">LS-2026-000001</span>
+                <span class="block text-xs text-ash" th:text="|${@fmt.date(o.createdAt)} · ${o.itemCount} item${o.itemCount == 1 ? '' : 's'}|">…</span></span>
+              <span class="flex items-center gap-3">
+                <span class="rounded-full px-2.5 py-1 text-xs font-semibold" th:classappend="${@fmt.statusClass(o.status)}" th:text="${@fmt.label(o.status)}">Paid</span>
+                <span class="font-semibold" th:text="${@fmt.money(o.total)}">$605.00</span>
+              </span>
+            </a>
+          </li>
+        </ul>
+      </div>
+
+      <div class="rounded-md bg-mist p-6">
+        <p class="display text-2xl">Your devices</p>
+        <p th:if="${p.devices.isEmpty()}" class="mt-3 text-sm text-ash">No devices recorded yet.</p>
+        <ul class="mt-3 grid gap-3 sm:grid-cols-2">
+          <li th:each="d : ${p.devices}" class="rounded-md bg-white p-4 text-sm">
+            <p class="font-semibold" th:text="|${@fmt.label(d.deviceType)} · ${d.os ?: 'Unknown OS'}|">Mobile · iOS</p>
+            <p class="text-ash" th:text="${d.browser ?: 'Unknown browser'}">Safari</p>
+            <p class="mt-1 text-xs text-ash" th:text="|Last used ${@fmt.ago(d.lastSeen)}|">Last used…</p>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <!--/* Right: promo panel (your photo: /images/profile.jpg) */-->
+    <aside class="relative isolate flex min-h-[28rem] flex-col justify-end overflow-hidden rounded-md bg-ink bg-cover bg-center p-6 text-white lg:sticky lg:top-32 lg:h-[36rem]"
+           style="background-image:url('/images/profile.jpg')">
+      <div class="absolute inset-0 -z-10 bg-gradient-to-t from-black/70 to-transparent"></div>
+      <p class="display text-lg text-white/80">Just landed</p>
+      <p class="display text-5xl">The new season edit</p>
+      <a th:href="@{/categories/new}" class="btn mt-5 w-fit bg-white text-ink hover:bg-white/90">Shop now <svg th:replace="~{fragments/icons :: icon('arrow-right', 'size-4')}"></svg></a>
+    </aside>
+  </div>
+</main>
+
+<footer th:replace="~{fragments/shop :: footer}"></footer>
+<th:block th:replace="~{fragments/layout :: feedback}"></th:block>
+<script th:src="@{/js/shop.js}"></script>
+</body>
+</html>

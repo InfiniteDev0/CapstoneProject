@@ -1,11 +1,11 @@
-# Vela Noire: Entity-Relationship Diagram
+# LuxuryShop: Entity-Relationship Diagram
 
-Vela Noire stores its data in two databases, each chosen for what it does best:
+LuxuryShop stores its data in two databases, each chosen for what it does best:
 
 | Database | Holds | Why |
 |---|---|---|
-| **MySQL** (`vela_noire`) | Users, devices, wishlist, cart, orders, order items, payments, churn predictions, retention offers, model metrics | Money and accounts need strict rules: fixed columns, foreign keys and transactions (ACID). |
-| **MongoDB** (`vela_noire`) | Products (with variants), categories, collections, reviews, clickstream events | Products differ in shape (an abaya has sizes and lengths; a perfume has scent notes). Clickstream is a fast-growing log. A flexible document store fits both. |
+| **MySQL** (`luxuryshop`) | Users, devices, wishlist, cart, orders, order items, payments, churn predictions, retention offers, model metrics | Money and accounts need strict rules: fixed columns, foreign keys and transactions (ACID). |
+| **MongoDB** (`luxuryshop`) | Products (with variants), categories, reviews, clickstream events | Products differ in shape (a jacket has a fill and a shell; a shoe has an upper and a drop), so each keeps its own `attributes`. Clickstream is a fast-growing log. A flexible document store fits both. |
 
 ## 1. MySQL tables
 
@@ -61,9 +61,7 @@ erDiagram
         CHAR product_id "Mongo products._id"
         VARCHAR sku "Mongo variants.sku"
         INT quantity "1 to 20"
-        VARCHAR selected_size
-        ENUM selected_style
-        ENUM shayla_type
+        VARCHAR selected_size "S, 9 or ONE_SIZE"
     }
     orders {
         BIGINT id PK
@@ -85,7 +83,9 @@ erDiagram
         CHAR product_id "Mongo products._id"
         VARCHAR sku
         VARCHAR product_name "snapshot"
-        VARCHAR category "snapshot"
+        VARCHAR category "snapshot: men, women, shoes"
+        VARCHAR sub_category "snapshot"
+        VARCHAR selected_size
         DECIMAL unit_price "snapshot"
         INT quantity
         DECIMAL line_total "generated"
@@ -137,12 +137,10 @@ erDiagram
 
 | Collection | Main fields | Notes |
 |---|---|---|
-| `products` | `_id`, `name`, `slug`, `category`, `collection`, `season`, `seasonalLine`, `basePrice` (Decimal128), `tags[]`, **`variants[]`** (`sku`, colour, stock), `abaya{}` or `perfume{}`, `ratings{average,count}` | Variants are **embedded**: always read with the product. |
-| `categories` | `slug`, `name`, `displayOrder` | abaya, perfume, handbag, bracelet, shayla, shoes, accessory |
-| `collections` | `slug`, `name`, `tagline`, `palette[]`, `lines[]` | 4 collections: Seasonal (Desert Bloom, Velvet Moon, Amber Luxe, Floral Grace), Modern Muse, Traditions Reimagined, Simplicity Speaks |
+| `products` | `_id`, `name`, `slug`, `category`, `subCategory`, `basePrice` (Decimal128), `isNew`, `isBestSeller`, `tags[]`, `images[]`, `sizes[]`, `attributes{}` (Material, Fit…), **`variants[]`** (`sku`, colour, stock), `ratings{average,count}` | Variants are **embedded**: always read with the product. Stock is per colour; the size is chosen in the bag. |
+| `categories` | `slug`, `name`, `displayOrder`, `subCategories[]` | men and women (topwear, bottomwear, outerwear, accessories), shoes (running, training, lifestyle) |
 | `reviews` | `productId`, `userId`, `rating` 1–5, `comment`, `verifiedPurchase` | **Referenced**, not embedded: reviews grow without limit. One per user per product. |
 | `clickstream_events` | `userId`, `sessionId`, `type` (VIEW, SEARCH, ADD_TO_CART, …), `productId`, `device`, `timestamp` | The AI's training data (churn + recommender). |
-| `brand_models` | `slug`, `name` | Empty for now. |
 
 Each collection has a `$jsonSchema` validator (`database/mongodb/schemas/`) that rejects bad documents.
 
@@ -171,7 +169,7 @@ flowchart LR
     CE -.-> P
 ```
 
-- MySQL stores a product's MongoDB `_id` as `CHAR(24)` (for example `6750a1000000000000000101`).
+- MySQL stores a product's MongoDB `_id` as `CHAR(24)` (for example `6750a1000000000000000301`).
 - MongoDB stores a MySQL `users.id` or `orders.id` as a number.
 - **There is no foreign key across the two databases.** Each database only polices its own rows. The **Java backend** checks the links instead: before adding to the cart or placing an order, it confirms in MongoDB that the product and SKU exist and are in stock.
-- `order_items` copies the product's name, category and price at purchase time (a **snapshot**). A receipt stays correct even if the product is later renamed, repriced or removed.
+- `order_items` copies the product's name, category, subcategory, colour, size and price at purchase time (a **snapshot**). A receipt stays correct even if the product is later renamed, repriced or removed.

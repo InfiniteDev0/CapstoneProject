@@ -1,0 +1,72 @@
+<!doctype html>
+<html th:replace="~{fragments/admin :: layout(${order.orderNumber}, ~{::#content}, ~{})}" lang="en" xmlns:th="http://www.thymeleaf.org">
+<body>
+<div id="content">
+  <a th:href="@{/admin/orders}" class="mt-4 inline-flex items-center gap-1 text-sm text-ash hover:text-ink">
+    <svg th:replace="~{fragments/icons :: icon('chevron-left', 'size-4')}"></svg> All orders
+  </a>
+  <div class="mb-6 mt-2 flex flex-wrap items-center gap-3">
+    <h2 class="text-2xl font-semibold tracking-tight" th:text="${order.orderNumber}">LS-2026-000001</h2>
+    <span class="rounded-full px-2.5 py-1 text-xs font-semibold" th:classappend="${@fmt.statusClass(order.status)}" th:text="${@fmt.label(order.status)}" data-order-status>Paid</span>
+    <span class="text-sm text-ash" th:text="|Placed ${@fmt.dateTime(order.createdAt)}|">…</span>
+  </div>
+
+  <div class="grid gap-5 lg:grid-cols-[1fr_20rem]">
+    <div class="flex flex-col gap-5">
+      <section class="rounded-lg bg-neutral-50 p-5">
+        <h3 class="font-semibold">Items</h3>
+        <table class="mt-3 w-full text-sm">
+          <tbody>
+            <tr th:each="i : ${order.items}">
+              <td class="py-2.5"><a th:href="@{/admin/products/{id}(id=${i.productId})}" class="font-medium hover:underline" th:text="${i.productName}">Stratus Runner</a>
+                <span class="block text-xs text-ash" th:text="|${i.sku} · ${i.colorName}${i.selectedSize != 'ONE_SIZE' ? ' · Size ' + i.selectedSize : ''}|">…</span></td>
+              <td class="py-2.5 text-right text-ash" th:text="|${@fmt.money(i.unitPrice)} × ${i.quantity}|">$420.00 × 1</td>
+              <td class="py-2.5 text-right font-medium" th:text="${@fmt.money(i.lineTotal)}">$420.00</td>
+            </tr>
+          </tbody>
+        </table>
+        <dl class="mt-4 ml-auto flex max-w-xs flex-col gap-1.5 text-sm">
+          <div class="flex justify-between"><dt class="text-ash">Subtotal</dt><dd th:text="${@fmt.money(order.subtotal)}">$605.00</dd></div>
+          <div th:if="${order.discountAmount.signum() > 0}" class="flex justify-between"><dt class="text-ash">Discount</dt><dd th:text="|−${@fmt.money(order.discountAmount)}|">−$0</dd></div>
+          <div class="flex justify-between"><dt class="text-ash">Shipping</dt><dd th:text="${@fmt.money(order.shippingFee)}">$0.00</dd></div>
+          <div class="flex justify-between font-semibold"><dt>Total</dt><dd th:text="${@fmt.money(order.total)}">$605.00</dd></div>
+        </dl>
+      </section>
+
+      <section class="rounded-lg bg-neutral-50 p-5">
+        <h3 class="font-semibold">Move this order along</h3>
+        <p th:if="${moves.isEmpty()}" class="mt-2 text-sm text-ash">This order is finished: nothing more to do.</p>
+        <div class="mt-3 flex flex-wrap gap-2">
+          <form th:each="m : ${moves}" th:action="@{/admin/orders/{id}/status(id=${order.id})}" method="post"
+                th:attr="data-confirm=${m.name() == 'CANCELLED' or m.name() == 'REFUNDED'} ? |${actions.get(m)}? The stock goes back on the shelf and the payment is marked refunded.| : null">
+            <input type="hidden" name="next" th:value="${m}">
+            <button class="btn btn-sm" th:text="${actions.get(m)}"
+                    th:classappend="${m.name() == 'CANCELLED' or m.name() == 'REFUNDED'} ? 'bg-rose-50 text-rose-700 hover:bg-rose-100' : 'btn-dark'">Mark as processing</button>
+          </form>
+        </div>
+      </section>
+    </div>
+
+    <aside class="flex flex-col gap-5">
+      <section class="rounded-lg bg-neutral-50 p-5 text-sm">
+        <h3 class="font-semibold">Customer</h3>
+        <a th:if="${customer != null}" th:href="@{/admin/customers/{id}(id=${customer.id})}" class="mt-3 flex items-center gap-3 rounded-md p-1 hover:bg-white">
+          <span class="grid size-9 place-items-center rounded-lg bg-ink text-xs font-semibold text-white" th:text="${@fmt.initials(customer.name)}">AH</span>
+          <span><span class="block font-medium" th:text="${customer.name}">Amira Hassan</span><span class="block text-xs text-ash" th:text="${customer.email}">…</span></span>
+        </a>
+      </section>
+      <section class="rounded-lg bg-neutral-50 p-5 text-sm">
+        <h3 class="font-semibold">Shipping</h3>
+        <p class="mt-2" th:text="${order.shippingName}">Amira Hassan</p>
+        <p class="text-ash" th:text="|${order.shippingAddress}, ${order.shippingCity}, ${order.shippingCountry}|">…</p>
+      </section>
+      <section th:if="${order.payment != null}" class="rounded-lg bg-neutral-50 p-5 text-sm">
+        <h3 class="font-semibold">Payment</h3>
+        <p class="mt-2" th:text="|${@fmt.label(order.payment.method)}${order.payment.cardLast4 != null ? ' ending ' + order.payment.cardLast4 : ''}|">Card ending 4242</p>
+        <p class="text-ash" th:text="|${@fmt.label(order.payment.status)} · ${order.payment.reference}|">Succeeded</p>
+      </section>
+    </aside>
+  </div>
+</div>
+</body>
+</html>

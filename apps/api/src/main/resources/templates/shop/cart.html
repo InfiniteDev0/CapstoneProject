@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head><th:block th:replace="~{fragments/layout :: head('Your bag')}"></th:block></head>
+<body class="scrollbar-pill">
+<header th:replace="~{fragments/shop :: header}"></header>
+
+<main class="mx-auto max-w-7xl px-4 pt-10 md:px-6">
+  <h1 class="display text-5xl md:text-6xl">Your bag</h1>
+
+  <th:block th:if="${bag.items.isEmpty()}">
+    <div th:replace="~{fragments/shop :: empty('bag', 'Your bag is empty', 'Pieces you add to your bag will wait for you here.')}"></div>
+    <div class="flex justify-center"><a th:href="@{/categories/new}" class="btn btn-dark">Shop new arrivals</a></div>
+  </th:block>
+
+  <div th:unless="${bag.items.isEmpty()}" class="mt-8 grid gap-10 lg:grid-cols-[1fr_22rem]">
+    <ul class="flex flex-col gap-4">
+      <li th:each="line : ${bag.items}" th:attr="data-bag-line=${line.id}" class="flex gap-4 rounded-md bg-mist p-3 sm:gap-5 sm:p-4">
+        <a th:href="${line.slug != null} ? @{/product/{s}(s=${line.slug})} : '#'" class="block w-24 shrink-0 sm:w-28">
+          <div class="aspect-[3/4] overflow-hidden rounded bg-white">
+            <img th:if="${line.image != null}" th:src="${line.image}" th:alt="${line.name}" class="size-full object-cover">
+            <div th:if="${line.image == null}" class="photo-box size-full bg-white"><svg th:replace="~{fragments/icons :: icon('image', 'size-6')}"></svg></div>
+          </div>
+        </a>
+        <div class="flex min-w-0 flex-1 flex-col">
+          <div class="flex items-start justify-between gap-3">
+            <a th:href="${line.slug != null} ? @{/product/{s}(s=${line.slug})} : '#'" class="font-semibold hover:underline" th:text="${line.name}">Stratus Runner</a>
+            <p class="shrink-0 font-semibold" th:text="${@fmt.money(line.lineTotal)}">$420.00</p>
+          </div>
+          <p class="mt-1 text-sm text-ash">
+            <span th:text="${line.colorName}">Onyx</span>
+            <span th:if="${line.selectedSize != 'ONE_SIZE'}" th:text="| · Size ${line.selectedSize}|"> · Size 9</span>
+            <span th:text="| · ${@fmt.money(line.unitPrice)} each|"> · $420.00 each</span>
+          </p>
+          <p th:if="${!line.available}" class="mt-2 text-xs font-semibold text-crimson"
+             th:text="${line.stock == 0} ? 'Sold out in this colour. Please remove it to check out.' : |Only ${line.stock} left. Please lower the quantity.|">Sold out</p>
+          <div class="mt-auto flex items-center justify-between pt-3">
+            <div class="flex items-center rounded-md bg-white">
+              <button type="button" data-qty-minus class="grid size-9 place-items-center hover:text-crimson disabled:opacity-30" th:disabled="${line.quantity <= 1}" aria-label="One less">
+                <svg th:replace="~{fragments/icons :: icon('minus', 'size-4')}"></svg>
+              </button>
+              <span data-qty class="w-8 text-center text-sm font-semibold" th:text="${line.quantity}">1</span>
+              <button type="button" data-qty-plus class="grid size-9 place-items-center hover:text-crimson" aria-label="One more">
+                <svg th:replace="~{fragments/icons :: icon('plus', 'size-4')}"></svg>
+              </button>
+            </div>
+            <button type="button" data-remove class="flex items-center gap-1.5 text-xs font-semibold text-ash hover:text-crimson">
+              <svg th:replace="~{fragments/icons :: icon('trash', 'size-4')}"></svg> Remove
+            </button>
+          </div>
+        </div>
+      </li>
+    </ul>
+
+    <aside class="h-fit rounded-md bg-mist p-6 lg:sticky lg:top-32">
+      <p class="display text-3xl">Summary</p>
+      <dl class="mt-5 flex flex-col gap-3 text-sm">
+        <div class="flex justify-between"><dt class="text-ash">Subtotal</dt><dd th:text="${@fmt.money(bag.subtotal)}">$605.00</dd></div>
+        <div class="flex justify-between"><dt class="text-ash">Shipping</dt><dd th:text="${bag.shippingFee.signum() == 0} ? 'Free' : ${@fmt.money(bag.shippingFee)}">Free</dd></div>
+        <p th:if="${bag.shippingFee.signum() > 0}" class="text-xs text-ash"
+           th:text="|Add ${@fmt.money(bag.freeShippingFrom.subtract(bag.subtotal))} more for free shipping|">Add $10 more for free shipping</p>
+        <div class="flex justify-between pt-3 text-base font-semibold"><dt>Total</dt><dd th:text="${@fmt.money(bag.total)}">$605.00</dd></div>
+      </dl>
+      <a th:href="@{/checkout}" class="btn btn-dark mt-6 w-full"
+         th:classappend="${#lists.contains(bag.items.![available], false)} ? 'pointer-events-none opacity-50'">Checkout</a>
+      <p th:if="${#lists.contains(bag.items.![available], false)}" class="mt-3 text-xs text-crimson">Fix the items marked in red first.</p>
+      <a th:href="@{/categories/new}" class="mt-4 block text-center text-sm underline underline-offset-4 hover:text-crimson">Continue shopping</a>
+    </aside>
+  </div>
+</main>
+
+<footer th:replace="~{fragments/shop :: footer}"></footer>
+<th:block th:replace="~{fragments/layout :: feedback}"></th:block>
+<script th:src="@{/js/shop.js}"></script>
+</body>
+</html>

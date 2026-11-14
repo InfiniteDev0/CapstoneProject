@@ -1,0 +1,102 @@
+<!doctype html>
+<html th:replace="~{fragments/admin :: layout('Dashboard', ~{::#content}, ~{::#scripts})}" lang="en" xmlns:th="http://www.thymeleaf.org">
+<body>
+<div id="content" th:with="s=${stats}">
+  <div th:replace="~{fragments/admin :: pageHeader('Dashboard', 'Sales, customers and stock at a glance. Sales count paid, processing, shipped and delivered orders.')}"></div>
+
+  <!--/* Stat cards */-->
+  <div class="grid grid-cols-2 gap-3 lg:grid-cols-4">
+    <a th:href="@{/admin/orders}" class="rounded-lg bg-neutral-50 p-5 hover:bg-neutral-100">
+      <p class="text-sm text-ash">Total sales</p>
+      <p class="mt-2 text-3xl font-semibold tracking-tight" th:text="${@fmt.money(s.totalSales)}">$2,080.00</p>
+      <p class="mt-1 text-xs text-ash" th:text="|Average order ${@fmt.money(s.averageOrderValue)}|">Average order…</p>
+    </a>
+    <a th:href="@{/admin/orders}" class="rounded-lg bg-neutral-50 p-5 hover:bg-neutral-100">
+      <p class="text-sm text-ash">Orders</p>
+      <p class="mt-2 text-3xl font-semibold tracking-tight" th:text="${s.orderCount}">4</p>
+      <p class="mt-1 text-xs text-ash" th:text="|${bellOrderCount} waiting to be packed|">1 waiting</p>
+    </a>
+    <a th:href="@{/admin/customers}" class="rounded-lg bg-neutral-50 p-5 hover:bg-neutral-100">
+      <p class="text-sm text-ash">Active users</p>
+      <p class="mt-2 text-3xl font-semibold tracking-tight" th:text="${s.activeUsers}">2</p>
+      <p class="mt-1 text-xs text-ash" th:text="|of ${s.totalCustomers} customers · last ${s.activeWindowDays} days|">of 2 customers</p>
+    </a>
+    <a th:href="@{/admin/churn}" class="rounded-lg bg-neutral-50 p-5 hover:bg-neutral-100">
+      <p class="text-sm text-ash">Churn rate</p>
+      <p class="mt-2 text-3xl font-semibold tracking-tight" th:text="${s.churnRate != null} ? |${#numbers.formatDecimal(s.churnRate * 100, 1, 1)}%| : '—'">—</p>
+      <p class="mt-1 text-xs text-ash" th:text="${s.churnRate != null} ? 'customers predicted to leave' : 'Activates in Phase 7'">Activates in Phase 7</p>
+    </a>
+  </div>
+
+  <!--/* Charts */-->
+  <div class="mt-6 grid gap-4 lg:grid-cols-[1.6fr_1fr]">
+    <section class="rounded-lg bg-neutral-50 p-5">
+      <div class="flex items-baseline justify-between">
+        <h3 class="font-semibold">Sales by month</h3>
+        <span class="text-xs text-ash">Last 12 months</span>
+      </div>
+      <div class="relative mt-4 h-72">
+        <canvas id="salesChart" aria-label="Sales by month"></canvas>
+        <p th:if="${s.salesByMonth.isEmpty()}" class="absolute inset-0 grid place-items-center text-sm text-ash">No sales yet.</p>
+      </div>
+    </section>
+    <section class="rounded-lg bg-neutral-50 p-5">
+      <h3 class="font-semibold">Top categories</h3>
+      <div class="relative mt-4 h-72">
+        <canvas id="categoryChart" aria-label="Top categories by revenue"></canvas>
+        <p th:if="${s.topCategories.isEmpty()}" class="absolute inset-0 grid place-items-center text-sm text-ash">No sales yet.</p>
+      </div>
+    </section>
+  </div>
+
+  <!--/* Recent orders + low stock */-->
+  <div class="mt-6 grid gap-4 lg:grid-cols-[1.6fr_1fr]">
+    <section class="rounded-lg bg-neutral-50 p-5">
+      <div class="flex items-center justify-between">
+        <h3 class="font-semibold">Recent orders</h3>
+        <a th:href="@{/admin/orders}" class="text-xs font-medium text-ash hover:text-ink">View all</a>
+      </div>
+      <p th:if="${recentOrders.isEmpty()}" class="py-10 text-center text-sm text-ash">No orders yet.</p>
+      <table th:unless="${recentOrders.isEmpty()}" class="mt-3 w-full text-sm">
+        <tbody>
+          <tr th:each="o : ${recentOrders}" class="cursor-pointer hover:bg-white" th:attr="data-href=@{/admin/orders/{id}(id=${o.id})}">
+            <td class="rounded-l-md py-2.5 pl-2 font-medium" th:text="${o.orderNumber}">LS-2026-000005</td>
+            <td class="hidden py-2.5 text-ash sm:table-cell" th:text="${o.customerName}">Amira Hassan</td>
+            <td class="py-2.5"><span class="rounded-full px-2 py-0.5 text-xs font-semibold" th:classappend="${@fmt.statusClass(o.status)}" th:text="${@fmt.label(o.status)}">Paid</span></td>
+            <td class="rounded-r-md py-2.5 pr-2 text-right font-medium" th:text="${@fmt.money(o.total)}">$260.00</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+    <section class="rounded-lg bg-neutral-50 p-5">
+      <div class="flex items-center justify-between">
+        <h3 class="font-semibold">Low stock</h3>
+        <a th:href="@{/admin/inventory}" class="text-xs font-medium text-ash hover:text-ink">Inventory</a>
+      </div>
+      <p th:if="${lowStock.isEmpty()}" class="py-10 text-center text-sm text-ash">Every colour is well stocked.</p>
+      <ul class="mt-3 flex flex-col gap-1 text-sm">
+        <li th:each="r : ${lowStock}">
+          <a th:href="@{/admin/products/{id}(id=${r.productId})}" class="flex items-center gap-3 rounded-md p-2 hover:bg-white">
+            <span class="size-3 shrink-0 rounded-full ring-1 ring-black/10" th:style="|background:${r.colorHex}|"></span>
+            <span class="min-w-0 flex-1 truncate" th:text="|${r.productName} · ${r.colorName}|">Overcoat · Camel</span>
+            <span class="font-semibold" th:classappend="${r.stock == 0} ? 'text-crimson' : 'text-amber-700'" th:text="${r.stock == 0} ? 'Sold out' : |${r.stock} left|">2 left</span>
+          </a>
+        </li>
+      </ul>
+    </section>
+  </div>
+</div>
+
+<div id="scripts">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.6/dist/chart.umd.min.js"></script>
+  <script th:inline="javascript">
+    window.DASHBOARD = {
+      months: /*[[${stats.salesByMonth.![month]}]]*/ [],
+      revenue: /*[[${stats.salesByMonth.![revenue]}]]*/ [],
+      categories: /*[[${stats.topCategories.![category]}]]*/ [],
+      categoryRevenue: /*[[${stats.topCategories.![revenue]}]]*/ []
+    };
+  </script>
+</div>
+</body>
+</html>

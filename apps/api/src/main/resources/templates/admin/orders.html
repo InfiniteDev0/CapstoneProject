@@ -1,0 +1,42 @@
+<!doctype html>
+<html th:replace="~{fragments/admin :: layout('Orders', ~{::#content}, ~{})}" lang="en" xmlns:th="http://www.thymeleaf.org">
+<body>
+<div id="content">
+  <div th:replace="~{fragments/admin :: pageHeader('Orders', |${results.totalItems} orders|)}"></div>
+
+  <div class="mb-4 flex flex-wrap items-center gap-2 text-sm">
+    <a th:with="u=${@fmt.withParam('status', null)}" th:href="${u}" class="rounded-md px-3 py-1.5" th:classappend="${status == null} ? 'bg-ink text-white' : 'bg-neutral-100 hover:bg-neutral-200'">All</a>
+    <a th:each="st : ${statuses}" th:with="u=${@fmt.withParam('status', st)}" th:href="${u}" th:text="${@fmt.label(st)}" class="rounded-md px-3 py-1.5"
+       th:classappend="${status == st} ? 'bg-ink text-white' : 'bg-neutral-100 hover:bg-neutral-200'">Paid</a>
+    <form method="get" class="ml-auto flex gap-2">
+      <input type="hidden" name="status" th:value="${status}">
+      <input name="q" type="search" th:value="${q}" placeholder="Order number or customer" class="h-9 w-60 rounded-md bg-neutral-100 px-3 outline-none focus:ring-2 focus:ring-ink/70">
+    </form>
+  </div>
+
+  <th:block th:if="${results.items.isEmpty()}">
+    <div th:replace="~{fragments/admin :: empty('receipt', 'No orders here', 'Orders appear as soon as customers check out.')}"></div>
+  </th:block>
+
+  <div th:unless="${results.items.isEmpty()}" class="scrollbar-pill overflow-x-auto rounded-lg bg-neutral-50">
+    <table class="w-full min-w-[44rem] text-sm">
+      <thead class="text-left text-xs text-ash">
+        <tr><th class="p-3 font-medium">Order</th><th class="p-3 font-medium">Customer</th><th class="p-3 font-medium">Date</th>
+          <th class="p-3 text-right font-medium">Items</th><th class="p-3 text-right font-medium">Total</th><th class="p-3 font-medium">Status</th></tr>
+      </thead>
+      <tbody>
+        <tr th:each="o : ${results.items}" class="cursor-pointer hover:bg-white" th:attr="data-href=@{/admin/orders/{id}(id=${o.id})}">
+          <td class="p-3 font-medium" th:text="${o.orderNumber}">LS-2026-000001</td>
+          <td class="p-3"><span th:text="${o.customerName}">Amira Hassan</span><span class="block text-xs text-ash" th:text="${o.customerEmail}">…</span></td>
+          <td class="p-3 text-ash" th:text="${@fmt.dateTime(o.createdAt)}">18 Sep 2026</td>
+          <td class="p-3 text-right" th:text="${o.itemCount}">2</td>
+          <td class="p-3 text-right font-medium" th:text="${@fmt.money(o.total)}">$605.00</td>
+          <td class="p-3"><span class="rounded-full px-2 py-0.5 text-xs font-semibold" th:classappend="${@fmt.statusClass(o.status)}" th:text="${@fmt.label(o.status)}">Delivered</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <nav th:replace="~{fragments/layout :: pager(${results})}"></nav>
+</div>
+</body>
+</html>

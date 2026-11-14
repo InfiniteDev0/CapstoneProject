@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head><th:block th:replace="~{fragments/layout :: head('My orders')}"></th:block></head>
+<body class="scrollbar-pill">
+<header th:replace="~{fragments/shop :: header}"></header>
+
+<main class="mx-auto max-w-4xl px-4 pt-10 md:px-6">
+  <a th:href="@{/account}" class="inline-flex items-center gap-1 text-sm text-ash hover:text-ink">
+    <svg th:replace="~{fragments/icons :: icon('chevron-left', 'size-4')}"></svg> Your account
+  </a>
+  <h1 class="display mt-3 text-5xl md:text-6xl">My orders</h1>
+
+  <th:block th:if="${orders.items.isEmpty()}">
+    <div th:replace="~{fragments/shop :: empty('package', 'No orders yet', 'When you place an order it will show up here, with its status.')}"></div>
+    <div class="flex justify-center"><a th:href="@{/categories/new}" class="btn btn-dark">Start shopping</a></div>
+  </th:block>
+
+  <ul th:unless="${orders.items.isEmpty()}" class="mt-8 flex flex-col gap-3">
+    <li th:each="o : ${orders.items}">
+      <a th:href="@{/account/orders/{id}(id=${o.id})}" class="flex flex-wrap items-center justify-between gap-3 rounded-md bg-mist p-5 hover:bg-smoke">
+        <div>
+          <p class="font-semibold" th:text="${o.orderNumber}">LS-2026-000001</p>
+          <p class="text-sm text-ash" th:text="|${@fmt.date(o.createdAt)} · ${o.firstItemName}${o.itemCount > 1 ? ' + ' + (o.itemCount - 1) + ' more' : ''}|">…</p>
+        </div>
+        <div class="flex items-center gap-4">
+          <span class="rounded-full px-2.5 py-1 text-xs font-semibold" th:classappend="${@fmt.statusClass(o.status)}" th:text="${@fmt.label(o.status)}">Delivered</span>
+          <span class="font-semibold" th:text="${@fmt.money(o.total)}">$605.00</span>
+          <svg th:replace="~{fragments/icons :: icon('chevron-right', 'size-4 text-ash')}"></svg>
+        </div>
+      </a>
+    </li>
+  </ul>
+  <nav th:replace="~{fragments/layout :: pager(${orders})}"></nav>
+</main>
+
+<footer th:replace="~{fragments/shop :: footer}"></footer>
+<th:block th:replace="~{fragments/layout :: feedback}"></th:block>
+<script th:src="@{/js/shop.js}"></script>
+</body>
+</html>

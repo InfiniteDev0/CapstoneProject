@@ -1,111 +1,88 @@
-# Vela Noire — Capstone Project
+# LuxuryShop — Capstone Project
 
 ## Who I am and how to work with me
 - I'm Yussuf, a software engineering student (Aptech ACCP, Semester 4) in Nairobi.
 - I am learning as we build, especially the **Java backend** and the **Python ML**. Explain like I'm a kid: short sentences, an analogy for every new idea, then the command or code.
 - Before each step: say in 1–2 lines what it does and why, then do it. After each phase: give a short recap of what I learned.
 - Ask before anything destructive (deleting folders, force-pushing, rewriting git history, dropping databases).
-- Use **pnpm**, never npm or yarn, for JavaScript apps.
+- Use **pnpm**, never npm or yarn, for JavaScript tools.
 - My machine: Windows, PowerShell, VS Code.
 
-## The game: a new world + an inventory chest 🎮
-- **New world (this repo):** `C:\Users\USER\OneDrive\Documents\School studies\Projects\CapstoneProject`. A clean slate. Everything is built here.
-- **Inventory chest (READ-ONLY):** `C:\Users\USER\OneDrive\Documents\My projects\VELA NOIRE`. My personal Vela Noire project, with folders `frontend/` (shop), `admin/` and `backend/` (Node/Express).
-  - **Never edit, move or delete anything in the inventory.** Only **copy** items out of it.
-  - Take what we need: logo, images, fonts, colors and theme (`globals.css`, `global.scss`), shadcn `ui/` components, layouts (Navbar, Footer, sidebar), tables, forms, toasts, page designs, brand text.
-  - Upgrade items as we copy them (cleaner code, consistent toasts with sonner, loading states). Don't copy junk (old notes, unused files, `node_modules`, `.next`, package-lock files).
-  - `backend/` is the **recipe book**: `prisma/schema.prisma` and `src/routes/*.js` show the data models and endpoints to rebuild in Java.
-  - `admin/brandDetails.md` is the **brand bible**. Copy it to `docs/`.
+## The game: a new world + two inventory chests 🎮
+- **New world (this repo):** `C:\Users\USER\OneDrive\Documents\School studies\Projects\CapstoneProject`. Everything is built here.
+- **Both chests are READ-ONLY. Never edit, move or delete anything in them. Only copy ideas and code out.**
+- **Chest #1: Vela Noire** `C:\Users\USER\OneDrive\Documents\My projects\VELA NOIRE` (Next.js shop + admin, Node backend). Now only a reference for the **admin layout** (sidebar + top bar) and shadcn-style components. Its brand, products and photos are no longer used.
+- **Chest #2: Under-Armour** `C:\Users\USER\Downloads\Under-Armour-main\Under-Armour-main` (my old React 18 + Vite practice project). Source of the **shop look** (top strip, navbar, hero, New Arrivals tiles, product grids, Categories page, Products page, RelatedProduct row, Login, Profile, LikedItems, footer, the toast style) and the **catalogue shape** (`src/assets/assets.js`, `pages.js`: category, subCategory, sizes, bestseller).
+  - ⚠️ Never copy its Under Armour names, logos, photos, athlete pictures or `curry.mp4`. Generic icons and the payment card logos are fine.
+  - ⚠️ Its `Context/ShopContext.jsx` contains real emails and passwords. Never copy them anywhere.
 
 ## What we are building
-**Vela Noire** is my luxury modest-fashion brand: "Middle Eastern Louis Vuitton". Abayas, perfume, handbags, bracelets, shayla, shoes and accessories. Tagline: "Luxury Reimagined for Her". Collections (we use only these **4**):
-1. **Seasonal**: Desert Bloom (summer), Velvet Moon (winter), Amber Luxe (autumn), Floral Grace (spring)
-2. **Modern Muse**
-3. **Traditions Reimagined**
-4. **Simplicity Speaks**
+**LuxuryShop**: a premium activewear and fashion store (an invented brand). Departments **Men, Women, Shoes**. Tagline "Move in luxury". Brand notes: `docs/brand.md`.
 
-Rare Collectibles, Lux Infinity and Infinity Bride are **dropped**. Use only the 4 above in the seed data (Phase 2 and later).
-
-The school capstone is called **"E-Commerce Intelligent Analytics & Personalization Suite"**. Vela Noire is the store we use for it. Deadline: **13 Dec 2026**, but I want it done in **one week**.
+The school capstone is called **"E-Commerce Intelligent Analytics & Personalization Suite"**. LuxuryShop is the store we use for it. Deadline: **13 Dec 2026**, but I want it done in **one week**.
 
 ### The restaurant analogy (use it to explain things)
 | Restaurant | Project |
 |---|---|
-| Dining room for guests | `apps/shop` — customer website (Next.js) |
-| Manager's office | `apps/admin` — admin website (Next.js) |
-| Kitchen that does the real work | `apps/api` — **Java Spring Boot** backend |
+| Dining room for guests | the shop pages: `apps/api` → `/` (Thymeleaf templates in `templates/shop`) |
+| Manager's office | the admin pages: `apps/api` → `/admin` (`templates/admin`) |
+| Kitchen that does the real work | `apps/api` services: **Java Spring Boot** |
+| Waiters who plate the food | page controllers (`web/pages`): fetch data, fill a Thymeleaf template |
+| Take-away hatch | the REST API `/api/**` (JSON + JWT), used by Python, tests and Swagger |
 | Receipt book | **MySQL** — users, orders, cart, transactions |
 | Menu album | **MongoDB** — products, reviews, clickstream logs |
 | Smart waiter who knows your taste and notices regulars who stopped coming | `ml/` — **Python FastAPI** for recommendations + churn |
 
-Guests never enter the kitchen. Shop/Admin → Java → databases. Java asks Python for AI answers.
+Everything runs from **one Spring Boot app on http://localhost:8080**. Java asks Python for AI answers.
 
 ## School requirements (the rules we must follow)
-- **Java 17+ Spring Boot**, clean MVC structure.
+- **Java 17+ Spring Boot**, clean MVC structure. **Pages rendered by Spring Boot with Thymeleaf** ✅ (done in the rebrand).
 - **Python** with scikit-learn, pandas, numpy; FastAPI exposing `/predict-churn` and `/get-recommendations`. Models saved as `.pkl`.
 - **MySQL** for users, credentials, orders and transactions. **MongoDB** for products, reviews and clickstream.
-- Password hashing, JWT or session login, role-based access (customer vs admin).
+- Password hashing, JWT or session login, role-based access (customer vs admin). We have both: session login (pages) and JWT (`/api`).
 - **Customer portal:** register/login, profile (demographics, tenure, devices, preferred categories), browse by category/price/tags, product detail (specs, stock, ratings), "Recommended For You" carousel, similar items, cart, simulated checkout, order history.
 - **Admin portal:** dashboard (total sales, active users, churn rate, top categories), customer list with churn risk High/Medium/Low, filter at-risk customers and send a retention discount, inventory management, model metrics (Accuracy, Precision, Recall, ROC-AUC for churn; Precision@K or RMSE for recommendations).
 - **Deliverables:** source code, SQL dump + MongoDB schemas, report (ER, use case and sequence diagrams, algorithm rationale, test cases), live demo: customer logs in and sees recommendations, then admin sees churn predictions.
-- ⚠️ The spec says pages should be Thymeleaf/JSP rendered by Spring Boot. We are using Next.js UIs calling Spring Boot as a REST API. I'm confirming with my lecturer that this is allowed.
 
-## Inventory list: what I have vs what I need
-**Key:** 📦 Copy from inventory · ⬆️ Copy and upgrade · 🔨 Craft new
+## The catalogue (from the Under-Armour structure, made premium)
+| Category | Subcategories |
+|---|---|
+| Men | Topwear, Bottomwear, Outerwear, Accessories |
+| Women | Topwear, Bottomwear, Outerwear, Accessories |
+| Shoes | Running, Training, Lifestyle |
 
-| Item | In my inventory | Needed for school | Action |
-|---|---|---|---|
-| Logo, icons, images | ✅ `frontend/public`, `src/app/icon.svg` | Brand look | 📦 Copy |
-| Fonts, colors, theme | ✅ `globals.css`, `global.scss` | Brand look | 📦 Copy |
-| shadcn UI parts (button, input, card, table, dialog, sidebar…) | ✅ both apps' `components/ui` | Building blocks | 📦 Copy |
-| Toasts / notifications | ✅ sonner + `useToast`, `toastStore` | Feedback messages | ⬆️ One clean toast style everywhere |
-| Shop layout (Navbar, Footer, Banner, Loader) | ✅ `frontend/src/components/shared` | Customer site | ⬆️ Copy and upgrade |
-| Home page (Hero, collections, models) | ✅ `frontend/src/components/home` | Customer site | ⬆️ Copy and upgrade |
-| Login form | ✅ both apps | Register/login | ⬆️ Rewire to Java JWT |
-| Account page (MyVn) | ✅ basic | Profile with demographics, devices, preferred categories | ⬆️ Extend |
-| Category pages (gifts, men) | ✅ basic | Browse by category, price, tags + search | ⬆️ Extend |
-| Product page | ❌ | Specs, stock, ratings, similar items | 🔨 Craft |
-| Cart page | ❌ (backend only) | Add/remove items | 🔨 Craft |
-| Checkout + order history | ❌ | Simulated checkout, saved orders | 🔨 Craft |
-| Reviews / ratings | ❌ | Ratings on products | 🔨 Craft |
-| "Recommended For You" carousel | ❌ | Personalised feed | 🔨 Craft |
-| Admin layout (sidebar, header, nav) | ✅ `admin/src/components` | Admin site | 📦 Copy |
-| Admin products, variants, inventory, collections | ✅ | Inventory management | ⬆️ Rewire to Java |
-| Admin tables | ✅ `product-table.jsx`, `ui/table.jsx` | Lists everywhere | 📦 Copy |
-| Admin dashboard | ✅ basic | Sales, active users, churn rate, top categories | ⬆️ Add charts |
-| Churn page | ❌ | Customers with High/Medium/Low risk + send discount | 🔨 Craft |
-| Model health page | ❌ | Accuracy, precision, recall, ROC-AUC, Precision@K | 🔨 Craft |
-| Data models | ✅ Prisma schema (PostgreSQL) | MySQL + MongoDB | ⬆️ Translate |
-| Backend | ✅ Node/Express | **Java Spring Boot** | 🔨 Craft (use recipe book) |
-| Login security | ✅ better-auth | BCrypt + JWT, roles | 🔨 Craft in Java |
-| Image uploads | ✅ Cloudinary | Not required | 📦 Keep |
-| Click tracking | ⚠️ recently viewed/searched only | Full clickstream in MongoDB | 🔨 Craft |
-| Fake data | ⚠️ small seed file | Lots of customers, orders, clicks | 🔨 Craft |
-| Python AI | ❌ | Churn + recommender + FastAPI | 🔨 Craft |
-| Report + diagrams | ❌ | ER, use case, sequence, tests | 🔨 Craft |
+- 72 invented products (28 Men, 28 Women, 16 Shoes), $80–$1,450. No real brand names or trademarks (no "UA", HeatGear, HOVR, ColdGear, Charged, Curry…).
+- Product fields: `category`, `subCategory`, `isNew` (the "New" tab), `isBestSeller`, `sizes[]` (empty = one size), `attributes{}` (Material, Fit…), `variants[]` (one per colour: SKU, hex, stock), `images[]`.
+- **Stock is per colour, not per size.** The size is saved on the cart and order line. (For the examiner: "size is recorded on each order line; stock is tracked per colour variant to keep checkout simple.")
+- **Gone:** collections, seasons, seasonal lines, abaya/perfume fields, brand models, flash sales, Kids.
+- Products start **without photos** (blank boxes). Yussuf adds product photos from the admin and page photos in `static/images/`.
 
-## Target structure (this repo)
+## Repo structure
 ```
 CapstoneProject/
-├── apps/
-│   ├── shop/        Next.js customer site      → http://localhost:3000
-│   ├── admin/       Next.js admin site         → http://localhost:3001
-│   └── api/         Java Spring Boot (Maven)   → http://localhost:8080
-├── ml/              Python FastAPI + notebooks → http://localhost:8000
+├── apps/api/        Spring Boot app → http://localhost:8080
+│   ├── src/main/java/com/luxuryshop/api/
+│   │   ├── web/pages/shop, web/pages/admin   page controllers (Thymeleaf)
+│   │   ├── web/actions                       small JSON calls from the pages (/web/**)
+│   │   ├── controller                        REST API (/api/**)
+│   │   └── service, repository, model, dto, security, exception, config
+│   ├── src/main/resources/templates/         shop/, admin/, fragments/, error.html
+│   ├── src/main/resources/static/            css/app.css (built), js/, fonts/, img/, images/
+│   └── styles/app.css                        Tailwind source
+├── ml/              Python FastAPI + notebooks → http://localhost:8000 (Phase 6)
 ├── database/        MySQL scripts + MongoDB schemas + seed data
-├── docs/            report, diagrams, brandDetails.md
-├── pnpm-workspace.yaml   (only shop + admin; Java uses Maven, Python uses pip)
-└── package.json          root scripts
+├── docs/            brand.md, image-credits.md, diagrams, report
+└── package.json     root scripts (Tailwind CLI + concurrently only)
 ```
 
 ## The phases
 | # | Phase | Restaurant version | Depends on |
 |---|---|---|---|
-| 1 | **The building** | Fresh monorepo, fresh shop + admin apps dressed in the Vela Noire look from the inventory, push to GitHub | — |
-| 2 | **The storage** | Install MySQL + MongoDB; translate the Prisma schema into MySQL tables + Mongo collections | 1 |
+| 1 | **The building** | Fresh monorepo, push to GitHub | — |
+| 2 | **The storage** | Install MySQL + MongoDB; tables + collections | 1 |
 | 3 | **The kitchen** | Spring Boot: auth (BCrypt + JWT), products, cart, orders, admin endpoints | 2 |
-| 4 | **The wiring** | Shop + admin talk to Java; craft product, cart, checkout and order pages; bring in admin product pages | 3 |
-| 5 | **Practice guests** | Generate fake customers, orders and clicks; log clickstream to MongoDB | 2, 3 |
+| 4 | **The wiring** | Shop + admin pages talk to the kitchen; product, cart, checkout, order and admin pages | 3 |
+| 5 | **Practice guests** | Generate fake customers, orders and clicks on the Men/Women/Shoes catalogue; log clickstream to MongoDB | 2, 3 |
 | 6 | **The smart waiter** | Python: churn model + recommender, FastAPI endpoints | 5 |
 | 7 | **Waiter meets kitchen** | Java calls Python; recommendations in shop; churn page, charts and metrics in admin | 3, 6 |
 | 8 | **Opening night** | Test the demo, export databases, report + diagrams, submit | all |
@@ -115,6 +92,7 @@ CapstoneProject/
 - [x] Phase 2 — The storage (done 2026-11-12)
 - [x] Phase 3 — The kitchen (done 2026-11-12)
 - [x] Phase 4 — The wiring (done 2026-11-12)
+- [x] Rebrand to LuxuryShop + pages moved to Thymeleaf (done 2026-11-14)
 - [ ] Phase 5 — Practice guests  ← **we are here**
 - [ ] Phase 6 — The smart waiter
 - [ ] Phase 7 — Waiter meets kitchen
@@ -123,45 +101,41 @@ CapstoneProject/
 Update this checklist at the end of each phase.
 
 ## Build notes (things later phases need to know)
-- **Versions:** Next.js 16.2.3 (pinned to match the inventory), React 19.2.4, Tailwind v4, pnpm 11, Node 22.
-- **Fonts are local** (`@fontsource-variable/outfit`, `@fontsource/birthstone`, `@fontsource-variable/geist-mono`), imported in each root layout. Don't use `next/font/google`: Turbopack dev crashes on it here ("next/font/google queries have exactly one entry").
-- **If a new page looks unstyled in dev**, restart `pnpm dev` (OneDrive can hide new files from Tailwind's watcher).
-- **pnpm 11** uses `allowBuilds:` in `pnpm-workspace.yaml` (not `ignoredBuiltDependencies`).
-- **Toasts:** always `import { notify } from "@/lib/toast"`. One `<Toaster />` lives in each root layout. Don't import `sonner` directly in pages.
-- **Auth in the websites (Phase 4):** shop token in cookie `vn_token`, admin token in `vn_admin_token` (cookies on localhost are shared across ports, so the names must differ). Each app has `src/proxy.js` (Next 16 middleware) guarding private routes on the server: shop `/account`, `/checkout`; admin `/dashboard/**` (role ADMIN). A normal (not httpOnly) cookie because Java returns the token as JSON. For the report: httpOnly set by the server would be safer.
-- **Copy the inventory faithfully.** Shop Navbar, Banner, Footer layout and login page are the originals (Navbar floats over the Hero, Banner stays pinned). Don't "improve" layouts without asking Yussuf first.
-- **Websites talk to Java through ONE client per app:** `src/lib/api.js` (base URL from `NEXT_PUBLIC_API_URL`, JWT, device/session ids, error toast from `{ message }`, 401 → login). Pages load data with `hooks/use-api.js` and always show a skeleton, an empty state and an error state. Both apps read `NEXT_PUBLIC_*` from the root `.env` (via `next.config.mjs`).
-- **Clickstream from the shop:** `src/lib/track.js` sends only VIEW (product page) and SEARCH (search box), fire-and-forget. Java logs ADD_TO_CART, REMOVE_FROM_CART, WISHLIST and PURCHASE itself. The browser sends `X-Session-Id` (per visit) and `X-Device-Id` (per browser).
-- **Phase 7 slots already wired:** shop `components/shop/RecommendedForYou.jsx` (hidden while empty; on home and product pages) and `components/product/SimilarItems.jsx` (same collection for now); admin `/dashboard/churn` and `/dashboard/models` call their endpoints and show "Activates in Phase 7"; the dashboard churn card and customer churn column show placeholders.
-- **Testing tip:** to test against a copy of the API without touching Yussuf's servers, run the jar with `--server.port=8090 --app.cors.allowed-origins=http://localhost:3101,http://localhost:3102`, build the app with `NEXT_PUBLIC_API_URL=http://localhost:8090`, and serve it with `next start -p 3101/3102`. Rebuild without the variable afterwards.
-- **Left in the inventory for later:** shop `text-animate.jsx`, home sections (Collection, models, services, shortcuts), admin `media-uploader.jsx` (Cloudinary) and `product-table.jsx` (all Phase 4).
-- **Footer contact details** are placeholders (`href="#"`). Yussuf to supply the real ones.
+- **Run:** `pnpm install` once, then `pnpm dev` (Tailwind watcher + Spring Boot with the `dev` profile, which reads templates and static files straight from `src/`, so edits show on refresh). `pnpm dev:api` = Java only. `pnpm css:build` rebuilds the committed CSS. `pnpm test:api` runs the tests.
+- **Versions:** Spring Boot 4.1 on **JDK 17**, Thymeleaf 3.1, Tailwind v4 (CLI), pnpm 11, Node 22. jjwt 0.13, springdoc 3.x. MongoDB properties are `spring.mongodb.*`; MockMvc lives in `org.springframework.boot.webmvc.test.autoconfigure`.
+- **Security = three doors** (`security/SecurityConfig.java`):
+  1. `/api/**` + Swagger: stateless **JWT** (`Authorization: Bearer`), no CSRF. Python and the tests use it.
+  2. `/admin/**`: form login at `/admin/login`, **ADMIN only** (a customer gets "This account doesn't have admin access…"), session + **CSRF**.
+  3. everything else (shop): form login at `/login`; browsing is public, `/cart`, `/checkout`, `/account`, `/liked`, `/web/**` need a login; session + CSRF.
+  - Shop and admin logins are kept under **different session keys** (`WebSessions`), so one browser can be signed in to both separately.
+  - Forms get the CSRF token automatically (`th:action`); fetch calls send it from the `<meta name="_csrf">` tag (`static/js/app.js` → `send()`).
+  - The principal is always `AuthUser(id, email, role)`, for both JWT and sessions.
+- **Thymeleaf 3.1 gotchas:**
+  - `th:replace` runs before `th:each` / `th:if` on the same tag: wrap it, e.g. `<th:block th:each="p : ${list}"><article th:replace="~{fragments/shop :: card(${p}, ${likedIds})}"></article></th:block>`.
+  - Bean calls (`${@fmt...}`) are **not allowed** inside `th:href`/`th:src` or fragment parameters: compute them first with `th:with="u=${@fmt.withParam('size', z)}" th:href="${u}"`.
+  - No page data inside `onclick`; use `data-*` attributes and JS.
+  - No apostrophes inside `|...|` literals.
+- **Shared template pieces:** `fragments/layout.html` (head, wordmark, toast + loading bar, pager), `fragments/shop.html` (header, footer, product card, empty state), `fragments/admin.html` (the admin frame: top bar + sidebar, page header, empty state), `fragments/icons.html` (line icons). `${@fmt...}` (`web/Fmt.java`) formats money, dates, labels and status colours.
+- **Toasts:** one Under-Armour style toast for the whole app: `toast("Added to bag")`, `toast(msg, "error")`, `toast(msg, "info")` (`static/js/toast.js`). After a redirect, controllers set `flash.addFlashAttribute("toast", "...")` (+ `toastType`).
+- **Loading, empty and error states:** a crimson loading bar on every navigation, spinners in busy buttons, an empty state on every list, a friendly `error.html` (404/403/500), and `WebErrorAdvice` turns service errors into that page for the web (the API keeps its JSON).
+- **Clickstream:** the product page logs VIEW and `/search` logs SEARCH (`ClickstreamService.logPageEvent`); cart, wishlist and checkout log ADD_TO_CART, REMOVE_FROM_CART, WISHLIST and PURCHASE. Web clicks use `web-<sessionId>` as the visit id. The browser also gets a stable `ls_device` cookie (`DeviceCookieFilter`) so logins record devices.
+- **Photos:** the admin uploads product photos (Products → product → Photos). They are saved in `apps/api/uploads/` (git-ignored, served at `/uploads/**`); the first is the cover, the second shows on hover. Page photos (hero, tiles, feature, profile) are dropped into `static/images/` with the names in its README; until then dark/grey boxes show. Record every photo source in `docs/image-credits.md`.
+- **Phase 7 slots:** the home page has a comment where "Recommended For You" goes (a Swiper row like Related Products); `/admin/churn` and `/admin/models` show "Activates in Phase 7"; the dashboard churn card and the customer churn column show placeholders. REST placeholders: `GET /api/admin/churn`, `/retention-offers`, `/model-metrics` return `[]`. Checkout can already redeem a `retention_offers` code.
+- **Testing tip:** to test without touching Yussuf's server on 8080, run the jar from `apps/api` with `--spring.profiles.active=dev --server.port=8090`. Drive pages with headless Edge over CDP (scripts in the scratchpad). `WebPagesTests` and `ApiFlowTests` clean up after themselves.
+- **Footer links and newsletter** are placeholders (`href="#"`, newsletter shows a "coming soon" toast).
 - **Python is not installed yet** (only the Microsoft Store alias). Install Python 3.12 before Phase 6.
-- Brand photos live in `apps/shop/public/assets/images/*.webp` (converted from the inventory PNGs).
-- **Databases (Phase 2):** how to install, create, seed and reset is in `database/README.md`; the ER diagram is in `docs/diagrams/er-diagram.md`.
-  - MySQL 9.3 runs as service `MySQL93` on port 3306. `mysql.exe` is **not on PATH**: it's at `C:\Program Files\MySQL\MySQL Server 9.3\bin`. The app connects as `vela_app` (password in `.env`), never as root. `database\mysql\reset.ps1` rebuilds the tables and seed.
-  - MongoDB 8.3 runs as service `MongoDB` on 27017. mongosh is at `%LOCALAPPDATA%\Programs\mongosh\mongosh.exe`. In PowerShell, run mongosh queries with `--file script.js`, not `--eval` (PowerShell strips the quotes).
-  - Product `_id`s are fixed (`6750a1000000000000000` + 3-digit code: 1xx Seasonal, 4xx Modern Muse, 6xx Traditions, 7xx Simplicity). MySQL stores them as `product_id CHAR(24)`. There's no foreign key across the two databases, so **Java must check** that a product and SKU exist and are in stock before cart and order writes.
+- **Databases:** see `database/README.md` (install, create, seed, reset, demo logins) and `docs/diagrams/er-diagram.md`.
+  - MySQL 9.3 runs as service `MySQL93` on port 3306. `mysql.exe` is **not on PATH**: it's at `C:\Program Files\MySQL\MySQL Server 9.3\bin`. The app connects as `luxury_app` to `luxuryshop` (password in `.env`), never as root. `database\mysql\reset.ps1` rebuilds the tables and seed.
+  - MongoDB 8.3 runs as service `MongoDB` on 27017, database `luxuryshop`. mongosh is at `%LOCALAPPDATA%\Programs\mongosh\mongosh.exe`. In PowerShell, run mongosh with `--file script.js`, not `--eval`.
+  - Product `_id`s are fixed (`6750a1000000000000000` + 3-digit code: 1xx Men, 2xx Women, 3xx Shoes). SKUs look like `LS-W-BOT-08-ONY`. MySQL stores product ids as `CHAR(24)`. There's no foreign key across the two databases, so **Java checks** product, SKU, size and stock before cart and order writes.
   - Money: MySQL `DECIMAL(10,2)`, Mongo `Decimal128`. In Java use `BigDecimal`, never `double`.
-  - Seed users: 1 admin, 2 Amira, 3 Layla (BCrypt `$2a$10$`, which Spring Security's `BCryptPasswordEncoder` accepts). The demo passwords are in `database/README.md`.
-- **API (Phase 3):** `apps/api`, Spring Boot 4.1 on **JDK 17** (Yussuf chose 17; it meets "Java 17+"). Every endpoint is listed in `apps/api/README.md`; Swagger is at http://localhost:8080/swagger-ui.html.
-  - Run it with `pnpm dev:api` (it runs `.\mvnw.cmd spring-boot:run`) and test with `cd apps/api; .\mvnw.cmd test`. It reads the root `.env` (MySQL, MongoDB, `JWT_SECRET`) through `spring.config.import`.
-  - Spring Boot 4 notes: the MongoDB properties are `spring.mongodb.*`; MockMvc lives in `org.springframework.boot.webmvc.test.autoconfigure`; springdoc is 3.x; jjwt is 0.13.
-  - Auth: `POST /api/auth/login` returns `{ token, user }`. The frontends send `Authorization: Bearer <token>`, plus optionally `X-Device-Id` (a stable browser id) and `X-Session-Id` (the visit id, which ties clickstream events together). CORS allows 3000 and 3001.
-  - Errors are always `{ error, message, status }`, so the frontends can show `message` with `notify.apiError`.
-  - Don't put `@Validated` on controllers: it turns URL validation errors into 500s (Spring MVC validates `@Pattern`/`@Min` on parameters by itself).
-  - The checkout pattern: take stock in MongoDB (atomic `$inc` with an "enough left" condition), write MySQL in `OrderWriter` (`@Transactional`), and give stock back if MySQL fails. Admin cancel/refund returns stock after the commit.
-  - The tests (`ApiFlowTests`) use the real local databases and clean up after themselves. When a dev server is already on 8080, start a second copy with `--server.port=8090`.
-  - Phase 7 placeholders: `GET /api/admin/churn`, `/retention-offers` and `/model-metrics` return `[]`; `DashboardStats.churnRate` and `CustomerRow.churnRisk` are null. Checkout can already redeem a `retention_offers` code.
-- **Admin UI (Barista-style shell):** `components/admin-shell.jsx` (frame), `admin-topbar.jsx` (logo, Ctrl K search, theme toggle, bell), `app-sidebar.jsx` (floating, collapsible card), `stat-card.jsx`, `notifications/` (@beui/alert cards, swipe gestures, AnimatedList). The menu lives in `lib/admin-nav.js`. Yussuf's taste: **no borders**, small but not tiny rounding (`rounded-lg`), no breadcrumb, no create button, and scrollbars use `.scrollbar-pill`.
+  - Seed users: 1 admin, 2 Amira, 3 Layla (`@luxuryshop.local`, BCrypt `$2a$10$`). 5 sample orders. The demo passwords are in `database/README.md`.
+  - The old `vela_noire` databases and `vela_app` user may still exist; drop them only after asking Yussuf.
+- **REST API details:** every endpoint is in `apps/api/README.md`; Swagger at http://localhost:8080/swagger-ui.html. Errors are always `{ error, message, status }`. Don't put `@Validated` on controllers (it turns URL validation errors into 500s). The checkout pattern: take stock in MongoDB (atomic `$inc` with an "enough left" condition), write MySQL in `OrderWriter` (`@Transactional`), give stock back if MySQL fails; admin cancel/refund returns stock after the commit.
+- **Admin look:** the old Vela Noire layout (full-width top bar with sidebar toggle, page title, search and bell; sidebar under it with the LS mark, menu and account) in LuxuryShop colours. Menu: Dashboard, Products (All · Add), Inventory, Orders, Customers, Churn Risk, Model Health. Yussuf's taste: **no borders**, `rounded-lg`, no breadcrumb, no create button in the top bar, scrollbars use `.scrollbar-pill`.
 
 ## Rules
-- Never commit `.env` files, secrets, `node_modules`, `.next`, `target/`, `.venv` or large data files.
-- Small commits with clear messages (`feat:`, `fix:`, `chore:`, `docs:`).
-- Keep the luxury look and feel. Don't redesign what works; copy it and tidy it.
-- Skip anything not needed for the spec or the demo (real payments, emails, mobile app).
-- **Toned down (removed from the shop, don't build):** The VN Gala, VN Saloon, Gifts & personalization services (monograms, gift wrap), Sales & Deals / flash-sale pages, and Rare Collectibles. The brand bible still mentions them; ignore those parts. (Still built: the AI "Recommended For You" personalisation and the admin retention discount, both required by the spec.)
-
-## Later ideas (not now)
-- **Seasonal theme:** the shop's colours and hero change with the current season. This is a rule based on the date, not ML (December → winter → Velvet Moon colours).
-- **Seasonal personalisation:** the recommender ranks which seasonal drop each customer sees first, based on their history. The theme follows the calendar; the products follow the person.
+- Never commit `.env` files, secrets, `node_modules`, `target/`, `.venv`, `uploads/` or large data files.
+- Small commits with clear messages (`feat:`, `fix:`, `chore:`, `docs:`, `refactor:`).
+- Keep the LuxuryShop look (Under-Armour layout, white / #101010 / crimson, Bebas Neue + Outfit). Don't redesign what works without asking.
+- Skip anything not needed for the spec or the demo (real payments, emails, mobile app, flash sales).

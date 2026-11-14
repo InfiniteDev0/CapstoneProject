@@ -1,0 +1,54 @@
+<!doctype html>
+<html th:replace="~{fragments/admin :: layout('Inventory', ~{::#content}, ~{})}" lang="en" xmlns:th="http://www.thymeleaf.org">
+<body>
+<div id="content">
+  <div th:replace="~{fragments/admin :: pageHeader('Inventory', 'Every colour on the shelf. Type a new number and save to restock.')}"></div>
+
+  <div class="mb-4 flex flex-wrap items-center gap-2 text-sm">
+    <a th:each="t : ${ { {'low','Low stock (5 or fewer)'}, {'out','Sold out'}, {'all','All colours'} } }" th:with="u=${@fmt.withParam('show', t[0])}" th:href="${u}"
+       th:text="${t[1]}" class="rounded-md px-3 py-1.5" th:classappend="${show == t[0]} ? 'bg-ink text-white' : 'bg-neutral-100 hover:bg-neutral-200'">Low</a>
+    <form method="get" class="ml-auto">
+      <input type="hidden" name="show" th:value="${show}">
+      <select name="category" class="h-9 rounded-md bg-neutral-100 px-2 outline-none" onchange="this.form.submit()" aria-label="Category">
+        <option value="">All categories</option>
+        <option th:each="c : ${categories}" th:value="${c.slug}" th:text="${c.name}" th:selected="${category == c.slug}">Men</option>
+      </select>
+    </form>
+  </div>
+
+  <th:block th:if="${rows.isEmpty()}">
+    <div th:replace="~{fragments/admin :: empty('boxes', ${show == 'out'} ? 'Nothing is sold out' : 'Nothing is running low', 'Every colour has more than 5 on the shelf.')}"></div>
+  </th:block>
+
+  <div th:unless="${rows.isEmpty()}" class="scrollbar-pill overflow-x-auto rounded-lg bg-neutral-50">
+    <table class="w-full min-w-[44rem] text-sm">
+      <thead class="text-left text-xs text-ash">
+        <tr><th class="p-3 font-medium">Product</th><th class="p-3 font-medium">Colour</th><th class="p-3 font-medium">SKU</th>
+          <th class="p-3 text-right font-medium">On the shelf</th><th class="p-3 font-medium">Restock</th></tr>
+      </thead>
+      <tbody>
+        <tr th:each="r : ${rows}" class="hover:bg-white">
+          <td class="p-3"><a th:href="@{/admin/products/{id}(id=${r.productId})}" class="font-medium hover:underline" th:text="${r.productName}">Overcoat</a>
+            <span class="block text-xs text-ash" th:text="|${@fmt.label(r.category)} · ${@fmt.label(r.status)}|">Men · Live</span></td>
+          <td class="p-3"><span class="flex items-center gap-2"><span class="size-3 rounded-full ring-1 ring-black/10" th:style="|background:${r.colorHex}|"></span><span th:text="${r.colorName}">Camel</span></span></td>
+          <td class="p-3 font-mono text-xs text-ash" th:text="${r.sku}">LS-M-OUT-19-CAM</td>
+          <td class="p-3 text-right"><span class="rounded-full px-2 py-0.5 text-xs font-semibold"
+              th:classappend="${r.stock == 0} ? 'bg-rose-50 text-rose-700' : (${r.stock <= 5} ? 'bg-amber-50 text-amber-700' : 'bg-emerald-50 text-emerald-700')"
+              th:text="${r.stock}">2</span></td>
+          <td class="p-3">
+            <form th:action="@{/admin/inventory/stock}" method="post" class="flex gap-2">
+              <input type="hidden" name="productId" th:value="${r.productId}">
+              <input type="hidden" name="sku" th:value="${r.sku}">
+              <input type="hidden" name="show" th:value="${show}">
+              <input type="hidden" name="category" th:value="${category}">
+              <input type="number" name="stock" min="0" max="100000" required th:value="${r.stock}" class="h-9 w-24 rounded-md bg-white px-2 outline-none focus:ring-2 focus:ring-ink/70" aria-label="New stock">
+              <button class="btn btn-dark btn-sm">Save</button>
+            </form>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+</body>
+</html>

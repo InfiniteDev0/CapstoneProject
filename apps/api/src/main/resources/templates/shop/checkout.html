@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head><th:block th:replace="~{fragments/layout :: head('Checkout')}"></th:block></head>
+<body class="scrollbar-pill">
+<header th:replace="~{fragments/shop :: header}"></header>
+
+<main class="mx-auto max-w-6xl px-4 pt-10 md:px-6">
+  <h1 class="display text-5xl md:text-6xl">Checkout</h1>
+
+  <div th:if="${error}" class="mt-6 flex items-start gap-3 rounded-md bg-rose-50 p-4 text-sm text-rose-800" role="alert">
+    <svg th:replace="~{fragments/icons :: icon('alert', 'size-5 shrink-0')}"></svg>
+    <span th:text="${error}">Only 1 left</span>
+  </div>
+
+  <div class="mt-8 grid gap-10 lg:grid-cols-[1fr_22rem]">
+    <form th:action="@{/checkout}" method="post" class="flex flex-col gap-8">
+      <section>
+        <h2 class="display text-2xl">Shipping</h2>
+        <div class="mt-4 grid gap-4 sm:grid-cols-2">
+          <div class="sm:col-span-2">
+            <label class="label" for="shippingName">Full name *</label>
+            <input id="shippingName" name="shippingName" th:value="${form.shippingName}" required maxlength="120" class="field" autocomplete="name">
+          </div>
+          <div class="sm:col-span-2">
+            <label class="label" for="shippingAddress">Address *</label>
+            <input id="shippingAddress" name="shippingAddress" th:value="${form.shippingAddress}" required maxlength="255" class="field" autocomplete="street-address">
+          </div>
+          <div>
+            <label class="label" for="shippingCity">City *</label>
+            <input id="shippingCity" name="shippingCity" th:value="${form.shippingCity}" required maxlength="80" class="field" autocomplete="address-level2">
+          </div>
+          <div>
+            <label class="label" for="shippingCountry">Country *</label>
+            <input id="shippingCountry" name="shippingCountry" th:value="${form.shippingCountry}" required maxlength="60" class="field" autocomplete="country-name">
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="display text-2xl">Payment</h2>
+        <p class="mt-1 text-xs text-ash">This is a simulated checkout for a student project: no money moves, and only the last 4 digits are kept.</p>
+        <div class="mt-4 grid gap-4 sm:grid-cols-2">
+          <div class="sm:col-span-2">
+            <label class="label" for="cardNumber">Card number *</label>
+            <input id="cardNumber" name="cardNumber" required inputmode="numeric" autocomplete="off" placeholder="4242 4242 4242 4242" class="field">
+          </div>
+          <div class="sm:col-span-2">
+            <label class="label" for="discountCode">Discount code</label>
+            <input id="discountCode" name="discountCode" th:value="${form.discountCode}" maxlength="32" class="field" placeholder="Optional">
+          </div>
+        </div>
+      </section>
+
+      <button class="btn btn-dark h-13 text-base" th:text="|Place order · ${@fmt.money(bag.total)}|">Place order</button>
+    </form>
+
+    <aside class="h-fit rounded-md bg-mist p-6">
+      <p class="display text-3xl">Your order</p>
+      <ul class="mt-5 flex flex-col gap-3 text-sm">
+        <li th:each="line : ${bag.items}" class="flex justify-between gap-3">
+          <span><span th:text="${line.name}">Stratus Runner</span>
+            <span class="block text-xs text-ash" th:text="|${line.colorName}${line.selectedSize != 'ONE_SIZE' ? ' · ' + line.selectedSize : ''} · × ${line.quantity}|">Onyx · 9 · × 1</span></span>
+          <span class="shrink-0" th:text="${@fmt.money(line.lineTotal)}">$420.00</span>
+        </li>
+      </ul>
+      <dl class="mt-5 flex flex-col gap-2 pt-4 text-sm">
+        <div class="flex justify-between"><dt class="text-ash">Subtotal</dt><dd th:text="${@fmt.money(bag.subtotal)}">$605.00</dd></div>
+        <div class="flex justify-between"><dt class="text-ash">Shipping</dt><dd th:text="${bag.shippingFee.signum() == 0} ? 'Free' : ${@fmt.money(bag.shippingFee)}">Free</dd></div>
+        <div class="flex justify-between pt-2 text-base font-semibold"><dt>Total</dt><dd th:text="${@fmt.money(bag.total)}">$605.00</dd></div>
+      </dl>
+    </aside>
+  </div>
+</main>
+
+<footer th:replace="~{fragments/shop :: footer}"></footer>
+<th:block th:replace="~{fragments/layout :: feedback}"></th:block>
+<script th:src="@{/js/shop.js}"></script>
+</body>
+</html>

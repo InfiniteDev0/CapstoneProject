@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head><th:block th:replace="~{fragments/layout :: head('Admin sign in')}"></th:block></head>
+<body class="grid min-h-screen place-items-center bg-neutral-50 px-4">
+<main class="w-full max-w-sm">
+  <div class="flex flex-col items-center gap-3 text-center">
+    <span class="grid size-12 place-items-center rounded-xl bg-ink font-display text-xl tracking-wider text-white">LS</span>
+    <span th:replace="~{fragments/layout :: wordmark('text-3xl')}"></span>
+    <p class="text-sm text-ash">Admin portal. Staff only.</p>
+  </div>
+
+  <div class="mt-8 rounded-lg bg-white p-6 shadow-sm">
+    <div th:if="${error}" class="mb-5 flex items-start gap-3 rounded-md bg-rose-50 p-3 text-sm text-rose-800" role="alert">
+      <svg th:replace="~{fragments/icons :: icon('alert', 'size-5 shrink-0')}"></svg><span th:text="${error}">…</span>
+    </div>
+    <div th:if="${signedOut}" class="mb-5 rounded-md bg-neutral-100 p-3 text-sm">You're signed out.</div>
+
+    <form th:action="@{/admin/login}" method="post" class="flex flex-col gap-4">
+      <div>
+        <label for="email" class="mb-1.5 block text-sm font-medium">Email</label>
+        <input id="email" name="email" type="email" required autocomplete="username" placeholder="admin@luxuryshop.local"
+               class="h-10 w-full rounded-md bg-neutral-100 px-3 text-sm outline-none focus:bg-white focus:ring-2 focus:ring-ink/70" autofocus>
+      </div>
+      <div>
+        <label for="password" class="mb-1.5 block text-sm font-medium">Password</label>
+        <input id="password" name="password" type="password" required autocomplete="current-password"
+               class="h-10 w-full rounded-md bg-neutral-100 px-3 text-sm outline-none focus:bg-white focus:ring-2 focus:ring-ink/70">
+      </div>
+      <button type="submit" class="btn btn-dark h-10 w-full">Sign in</button>
+    </form>
+  </div>
+  <p class="mt-6 text-center text-xs text-ash"><a href="/" class="hover:underline">← Back to the shop</a></p>
+</main>
+<th:block th:replace="~{fragments/layout :: feedback}"></th:block>
+</body>
+</html>
