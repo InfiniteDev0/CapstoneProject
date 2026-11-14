@@ -21,10 +21,17 @@
       </div>
       <div>
         <label class="label" for="password">Password *</label>
-        <input id="password" name="password" type="password" required autocomplete="current-password" placeholder="Password" class="field h-12">
+        <div class="relative">
+          <input id="password" name="password" type="password" required autocomplete="current-password" placeholder="Password" class="field h-12 pr-11">
+          <button type="button" data-toggle-password class="absolute inset-y-0 right-0 grid w-11 place-items-center text-ash hover:text-ink" aria-label="Show password" aria-pressed="false">
+            <svg th:replace="~{fragments/icons :: icon('eye', 'size-4.5 eye-show')}"></svg>
+            <svg th:replace="~{fragments/icons :: icon('eye-off', 'size-4.5 eye-hide hidden')}"></svg>
+          </button>
+        </div>
       </div>
+      <label class="flex items-center gap-2 text-sm text-ash"><input type="checkbox" name="remember" checked class="size-4 accent-black"> Remember me</label>
       <button type="submit" class="btn btn-dark h-12 text-base">
-        <span th:replace="~{fragments/layout :: wordmark('text-lg')}"></span> Log in
+        Log in
       </button>
     </form>
     <p class="mt-6 text-sm text-ash">New to LuxuryShop? <a th:href="@{/register}" class="font-semibold text-ink underline underline-offset-4 hover:text-crimson">Register</a></p>

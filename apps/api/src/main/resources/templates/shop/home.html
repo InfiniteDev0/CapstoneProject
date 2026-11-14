@@ -6,8 +6,8 @@
 
 <main>
   <!--/* Hero: a full-width photo with the title block on top (your photo: /images/hero.jpg) */-->
-  <section class="relative isolate flex min-h-[min(72vh,44rem)] items-end overflow-hidden bg-ink bg-cover bg-center text-white"
-           style="background-image:url('/images/hero.jpg')">
+  <section class="relative isolate flex min-h-[min(72vh,44rem)] items-end overflow-hidden bg-ink bg-cover bg-[position:center_12%] text-white"
+           style="background-image:url('/images/hero.webp'),url('/images/hero.jpg')">
     <div class="absolute inset-0 -z-10 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
     <div class="mx-auto w-full max-w-7xl px-4 pb-14 md:px-6 md:pb-20">
       <p class="display text-xl text-white/80">The new season edit</p>
@@ -17,9 +17,9 @@
     </div>
   </section>
 
-  <!--/* New Arrivals: category tiles */-->
+  <!--/* Categories: the tiles */-->
   <section class="mx-auto max-w-7xl px-4 pt-16 md:px-6">
-    <h2 class="display text-4xl md:text-5xl">New Arrivals</h2>
+    <h2 class="display text-4xl md:text-5xl">Categories</h2>
     <div class="no-scrollbar mt-6 grid auto-cols-[70%] grid-flow-col gap-4 overflow-x-auto sm:auto-cols-[45%] lg:grid-flow-row lg:grid-cols-4">
       <a th:each="t : ${ {'men','women','shoes','new'} }" th:href="@{/categories/{s}(s=${t})}" class="group block">
         <div class="aspect-[3/4] overflow-hidden rounded-md bg-mist bg-cover bg-center transition duration-500 group-hover:opacity-90"
@@ -32,10 +32,10 @@
     </div>
   </section>
 
-  <!--/* New In: the newest pieces */-->
+  <!--/* New Arrivals: the newest pieces */-->
   <section class="mx-auto max-w-7xl px-4 pt-20 md:px-6">
     <div class="flex items-end justify-between gap-4">
-      <h2 class="display text-4xl md:text-5xl">New In</h2>
+      <h2 class="display text-4xl md:text-5xl">New Arrivals</h2>
       <a th:href="@{/categories/new}" class="text-sm font-semibold underline underline-offset-4 hover:text-crimson">View all</a>
     </div>
     <th:block th:if="${newIn.isEmpty()}"><div th:replace="~{fragments/shop :: empty('package', 'New pieces are on their way', 'Check back soon for the latest drops.')}"></div></th:block>

@@ -48,15 +48,30 @@
 
   // ---- loading bar --------------------------------------------------------------------
   const bar = document.getElementById("loadbar");
-  const startBar = () => bar && bar.classList.add("busy");
+  const loader = document.getElementById("pageloader");
+  let loaderTimer = null;
+  /** Start the loading animations. The full overlay only shows if the page takes over 150 ms. */
+  const startBar = () => {
+    bar && bar.classList.add("busy");
+    clearTimeout(loaderTimer);
+    loaderTimer = setTimeout(() => loader && loader.classList.add("show"), 150);
+  };
+  const stopBar = () => {
+    clearTimeout(loaderTimer);
+    bar && bar.classList.remove("busy");
+    loader && loader.classList.remove("show");
+  };
+  window.pageLoading = startBar;
   document.addEventListener("click", (e) => {
     const a = e.target.closest("a[href]");
     if (!a || a.target === "_blank" || e.ctrlKey || e.metaKey || e.shiftKey) return;
     const href = a.getAttribute("href");
-    if (!href || href.startsWith("#") || href.startsWith("javascript")) return;
+    if (!href || href.startsWith("#") || href.startsWith("javascript") || a.hasAttribute("download")) return;
+    if (a.origin !== location.origin || e.defaultPrevented) return;
     startBar();
   });
-  window.addEventListener("pageshow", () => bar && bar.classList.remove("busy"));
+  // back/forward from the browser cache: clear the animation
+  window.addEventListener("pageshow", stopBar);
 
   // ---- forms: confirm + spinner -------------------------------------------------------
   document.addEventListener("submit", (e) => {
@@ -65,13 +80,29 @@
       e.preventDefault();
       return;
     }
-    if (form.method.toLowerCase() === "get" || form.hasAttribute("data-no-spinner")) {
-      startBar();
-      return;
-    }
     const button = e.submitter || form.querySelector('[type="submit"]');
-    if (button && !button.hasAttribute("data-no-spinner")) setTimeout(() => busy(button, true), 0);
-    startBar();
+    // Wait one tick: if another script handled the form itself (preventDefault, e.g. the
+    // newsletter box), the page isn't leaving, so no loader and no spinner.
+    setTimeout(() => {
+      if (e.defaultPrevented) return;
+      const leaving = form.method.toLowerCase() === "get" || form.hasAttribute("data-no-spinner");
+      if (!leaving && button && !button.hasAttribute("data-no-spinner")) busy(button, true);
+      startBar();
+    }, 0);
+  });
+
+  // ---- show / hide password (the eye button) ------------------------------------------
+  document.addEventListener("click", (e) => {
+    const eye = e.target.closest("[data-toggle-password]");
+    if (!eye) return;
+    const input = eye.parentElement.querySelector("input");
+    const showing = input.type === "text";
+    input.type = showing ? "password" : "text";
+    eye.setAttribute("aria-pressed", String(!showing));
+    eye.setAttribute("aria-label", showing ? "Show password" : "Hide password");
+    eye.querySelector(".eye-show")?.classList.toggle("hidden", !showing);
+    eye.querySelector(".eye-hide")?.classList.toggle("hidden", showing);
+    input.focus();
   });
 
   // ---- dropdowns ----------------------------------------------------------------------

@@ -110,7 +110,7 @@ class WebPagesTests {
                 .andExpect(content().string(containsString("Stratus Runner")));
         mvc.perform(get("/admin/inventory").param("show", "all").session(session)).andExpect(status().isOk());
         mvc.perform(get("/admin/orders").session(session)).andExpect(status().isOk())
-                .andExpect(content().string(containsString("LS-2026-000001")));
+                .andExpect(content().string(containsString("orders")));
         mvc.perform(get("/admin/customers").session(session)).andExpect(status().isOk());
         mvc.perform(get("/admin/products/new").session(session)).andExpect(status().isOk());
     }

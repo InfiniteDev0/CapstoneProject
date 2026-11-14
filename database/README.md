@@ -12,7 +12,7 @@ database/
 ├── mysql/
 │   ├── setup.ps1     creates the database + the luxury_app user (run once, needs root)
 │   ├── schema.sql    the 10 tables
-│   ├── seed.sql      sample users, devices, wishlist, bag, 5 orders
+│   ├── seed.sql      sample users, devices, wishlist and bag (no orders)
 │   └── reset.ps1     rebuilds the tables and loads the seed (as luxury_app)
 └── mongodb/
     ├── schemas/      $jsonSchema validators, one per collection
@@ -96,14 +96,14 @@ mongosh --file database/mongodb/seed.js
 ## 6. Check it worked
 
 ```sql
--- MySQL (as luxury_app): 10 tables, 3 users, 5 orders
+-- MySQL (as luxury_app): 10 tables, 3 users, no orders until someone checks out
 SHOW TABLES;
 SELECT id, name, email, role FROM users;
 SELECT order_number, status, product_name, sku, selected_size, unit_price
 FROM orders o JOIN order_items oi ON oi.order_id = o.id;
 ```
 ```js
-// mongosh: the two products in order 1
+// mongosh: two of the products
 use luxuryshop
 db.products.find(
   { _id: { $in: [ObjectId("6750a1000000000000000208"), ObjectId("6750a1000000000000000301")] } },
@@ -131,11 +131,11 @@ The `product_id` and `sku` in MySQL match the `_id` and `variants.sku` in MongoD
 | | Count |
 |---|---|
 | MySQL users | 3 (1 admin, 2 customers) |
-| MySQL orders | 5 (delivered, shipped, paid, and one cancelled + refunded) |
+| MySQL orders | none (orders come from real checkouts; Phase 5 adds practice orders) |
 | MongoDB products | 72 |
 | MongoDB categories | 3 (with their subcategories) |
-| MongoDB reviews | 8 |
-| MongoDB clickstream events | 19 |
+| MongoDB reviews | 8 (none marked "verified purchase") |
+| MongoDB clickstream events | 16 (browsing only) |
 
 The large practice dataset (hundreds of customers, orders and clicks) is generated in Phase 5.
 

@@ -1,5 +1,6 @@
 package com.luxuryshop.api.security;
 
+import com.luxuryshop.api.repository.jpa.UserRepository;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -83,7 +84,9 @@ public class SecurityConfig {
 
     @Bean
     @Order(2)
-    public SecurityFilterChain adminChain(HttpSecurity http, WebLoginService logins) throws Exception {
+    public SecurityFilterChain adminChain(HttpSecurity http, WebLoginService logins, UserRepository users,
+            @Value("${app.jwt.secret}") String secret) throws Exception {
+        var remember = RememberMe.admin(secret, users);
         var requestCache = WebSessions.requestCache(WebSessions.ADMIN_KEY);
         var success = new SavedRequestAwareAuthenticationSuccessHandler();
         success.setRequestCache(requestCache);
@@ -102,6 +105,7 @@ public class SecurityConfig {
                         .usernameParameter("email")
                         .successHandler(success)
                         .failureUrl("/admin/login?error"))
+                .rememberMe(r -> r.rememberMeServices(remember).key(remember.getKey()))
                 .logout(out -> out
                         .logoutUrl("/admin/logout")
                         .logoutSuccessUrl("/admin/login?logout")
@@ -118,7 +122,9 @@ public class SecurityConfig {
 
     @Bean
     @Order(3)
-    public SecurityFilterChain shopChain(HttpSecurity http, WebLoginService logins) throws Exception {
+    public SecurityFilterChain shopChain(HttpSecurity http, WebLoginService logins, UserRepository users,
+            @Value("${app.jwt.secret}") String secret) throws Exception {
+        var remember = RememberMe.shop(secret, users);
         var requestCache = WebSessions.requestCache(WebSessions.SHOP_KEY);
         var success = new SavedRequestAwareAuthenticationSuccessHandler();
         success.setRequestCache(requestCache);
@@ -139,6 +145,7 @@ public class SecurityConfig {
                         .usernameParameter("email")
                         .successHandler(success)
                         .failureUrl("/login?error"))
+                .rememberMe(r -> r.rememberMeServices(remember).key(remember.getKey()))
                 .logout(out -> out
                         .logoutUrl("/logout")
                         .logoutSuccessUrl("/?signedOut")

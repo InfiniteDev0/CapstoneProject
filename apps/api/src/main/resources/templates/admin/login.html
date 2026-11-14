@@ -23,9 +23,16 @@
       </div>
       <div>
         <label for="password" class="mb-1.5 block text-sm font-medium">Password</label>
-        <input id="password" name="password" type="password" required autocomplete="current-password"
-               class="h-10 w-full rounded-md bg-neutral-100 px-3 text-sm outline-none focus:bg-white focus:ring-2 focus:ring-ink/70">
+        <div class="relative">
+          <input id="password" name="password" type="password" required autocomplete="current-password"
+                 class="h-10 w-full rounded-md bg-neutral-100 px-3 text-sm outline-none focus:bg-white focus:ring-2 focus:ring-ink/70 pr-11">
+          <button type="button" data-toggle-password class="absolute inset-y-0 right-0 grid w-11 place-items-center text-ash hover:text-ink" aria-label="Show password" aria-pressed="false">
+            <svg th:replace="~{fragments/icons :: icon('eye', 'size-4.5 eye-show')}"></svg>
+            <svg th:replace="~{fragments/icons :: icon('eye-off', 'size-4.5 eye-hide hidden')}"></svg>
+          </button>
+        </div>
       </div>
+      <label class="flex items-center gap-2 text-sm"><input type="checkbox" name="remember" checked class="size-4 accent-black"> Remember me</label>
       <button type="submit" class="btn btn-dark h-10 w-full">Sign in</button>
     </form>
   </div>

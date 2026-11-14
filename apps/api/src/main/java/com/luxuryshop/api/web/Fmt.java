@@ -21,7 +21,8 @@ import org.springframework.web.util.UriComponentsBuilder;
 @Component("fmt")
 public class Fmt {
 
-    private static final ZoneId ZONE = ZoneId.of("UTC");
+    /** Times are stored in UTC and shown in the computer's own time zone (Nairobi here: UTC+3). */
+    private static final ZoneId ZONE = ZoneId.systemDefault();
     private static final DateTimeFormatter DAY = DateTimeFormatter.ofPattern("d MMM yyyy", Locale.ENGLISH).withZone(ZONE);
     private static final DateTimeFormatter DAY_TIME = DateTimeFormatter.ofPattern("d MMM yyyy, HH:mm", Locale.ENGLISH).withZone(ZONE);
 

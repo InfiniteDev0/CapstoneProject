@@ -47,7 +47,7 @@
   document.addEventListener("click", (e) => {
     const row = e.target.closest("[data-href]");
     if (!row || e.target.closest("a, button, input, select, form")) return;
-    document.getElementById("loadbar")?.classList.add("busy");
+    window.pageLoading?.();
     location.href = row.dataset.href;
   });
 

@@ -5,7 +5,7 @@ Until then each spot shows a clean dark or grey box.
 
 | File | Where it shows | Good size |
 |---|---|---|
-| `hero.jpg` | Home page hero (full width) | 2400 × 1200 |
+| `hero.jpg` or `hero.webp` | Home page hero (full width). **Git-ignored**: stays on your computer only | 2400 × 1200 |
 | `tile-men.jpg` | Home "New Arrivals" tile: Men | 900 × 1200 |
 | `tile-women.jpg` | Home tile: Women | 900 × 1200 |
 | `tile-shoes.jpg` | Home tile: Shoes | 900 × 1200 |

@@ -270,13 +270,13 @@ const products = [
 // -----------------------------------------------------------------------------
 const reviews = [
   { productId: id("208"), userId: int(2), userName: "Amira H.", rating: int(5), title: "Worth every penny",
-    comment: "Squat-proof, holds its shape and the onyx is a true black.", verifiedPurchase: true, createdAt: day("2026-09-25T18:00:00Z") },
+    comment: "Squat-proof, holds its shape and the onyx is a true black.", verifiedPurchase: false, createdAt: day("2026-09-25T18:00:00Z") },
   { productId: id("301"), userId: int(2), userName: "Amira H.", rating: int(5), title: "Like running on air",
-    comment: "Light, springy and they look smart enough to wear out.", verifiedPurchase: true, createdAt: day("2026-09-26T18:10:00Z") },
+    comment: "Light, springy and they look smart enough to wear out.", verifiedPurchase: false, createdAt: day("2026-09-26T18:10:00Z") },
   { productId: id("202"), userId: int(3), userName: "Layla M.", rating: int(4), title: "Beautiful drape",
-    comment: "So soft. It runs a little big, so size down.", verifiedPurchase: true, createdAt: day("2026-08-22T10:00:00Z") },
+    comment: "So soft. It runs a little big, so size down.", verifiedPurchase: false, createdAt: day("2026-08-22T10:00:00Z") },
   { productId: id("228"), userId: int(3), userName: "Layla M.", rating: int(5), title: "My everyday bag",
-    comment: "Fits phone, keys and cards, and the leather is gorgeous.", verifiedPurchase: true, createdAt: day("2026-08-22T10:05:00Z") },
+    comment: "Fits phone, keys and cards, and the leather is gorgeous.", verifiedPurchase: false, createdAt: day("2026-08-22T10:05:00Z") },
   { productId: id("216"), userId: int(2), userName: "Amira H.", rating: int(4), title: "Stunning coat",
     comment: "Warm without the bulk. The camel colour is perfect.", verifiedPurchase: false, createdAt: day("2026-10-10T12:00:00Z") },
   { productId: id("312"), userId: int(3), userName: "Layla M.", rating: int(5), title: "The perfect white sneaker",
@@ -288,7 +288,7 @@ const reviews = [
 ];
 
 // -----------------------------------------------------------------------------
-// Clickstream: the demo customers' sessions that match the MySQL sample orders
+// Clickstream: a few browsing sessions for the demo customers (no purchases: there are no sample orders)
 // -----------------------------------------------------------------------------
 const ev = (userId, sessionId, type, device, iso, extra = {}) => ({
   userId: int(userId), sessionId, type, device, timestamp: day(iso),
@@ -300,18 +300,15 @@ const clickstream = [
   ev(2, "sess-amira-20260918", "ADD_TO_CART", "MOBILE", "2026-09-18T19:43:40Z", { productId: id("208"), category: "women", page: "/product/womens-sculpt-seamless-legging" }),
   ev(2, "sess-amira-20260918", "VIEW", "MOBILE", "2026-09-18T19:45:00Z", { productId: id("301"), category: "shoes", page: "/product/stratus-runner" }),
   ev(2, "sess-amira-20260918", "ADD_TO_CART", "MOBILE", "2026-09-18T19:46:20Z", { productId: id("301"), category: "shoes", page: "/product/stratus-runner" }),
-  ev(2, "sess-amira-20260918", "PURCHASE", "MOBILE", "2026-09-18T19:52:00Z", { orderId: int(1), page: "/checkout" }),
   ev(2, "sess-amira-20261102", "VIEW", "DESKTOP", "2026-11-02T10:05:00Z", { productId: id("215"), category: "women", page: "/product/womens-cropped-puffer-jacket" }),
   ev(2, "sess-amira-20261102", "VIEW", "DESKTOP", "2026-11-02T10:07:00Z", { productId: id("216"), category: "women", page: "/product/womens-belted-wool-coat" }),
   ev(2, "sess-amira-20261102", "WISHLIST", "DESKTOP", "2026-11-02T10:07:40Z", { productId: id("216"), category: "women", page: "/product/womens-belted-wool-coat" }),
   ev(2, "sess-amira-20261102", "ADD_TO_CART", "DESKTOP", "2026-11-02T10:09:00Z", { productId: id("215"), category: "women", page: "/product/womens-cropped-puffer-jacket" }),
-  ev(2, "sess-amira-20261102", "PURCHASE", "DESKTOP", "2026-11-02T10:12:00Z", { orderId: int(2), page: "/checkout" }),
   ev(3, "sess-layla-20260815", "SEARCH", "MOBILE", "2026-08-15T12:50:00Z", { query: "belt bag", page: "/categories/women" }),
   ev(3, "sess-layla-20260815", "VIEW", "MOBILE", "2026-08-15T12:51:00Z", { productId: id("228"), category: "women", page: "/product/womens-leather-belt-bag" }),
   ev(3, "sess-layla-20260815", "ADD_TO_CART", "MOBILE", "2026-08-15T12:53:30Z", { productId: id("228"), category: "women", page: "/product/womens-leather-belt-bag" }),
   ev(3, "sess-layla-20260815", "VIEW", "MOBILE", "2026-08-15T12:57:00Z", { productId: id("202"), category: "women", page: "/product/womens-silk-jersey-tee" }),
   ev(3, "sess-layla-20260815", "ADD_TO_CART", "MOBILE", "2026-08-15T12:58:10Z", { productId: id("202"), category: "women", page: "/product/womens-silk-jersey-tee" }),
-  ev(3, "sess-layla-20260815", "PURCHASE", "MOBILE", "2026-08-15T13:05:00Z", { orderId: int(3), page: "/checkout" }),
   ev(3, "sess-layla-20261005", "VIEW", "MOBILE", "2026-10-05T21:00:00Z", { productId: id("215"), category: "women", page: "/product/womens-cropped-puffer-jacket" }),
   ev(3, "sess-layla-20261005", "WISHLIST", "MOBILE", "2026-10-05T21:01:00Z", { productId: id("215"), category: "women", page: "/product/womens-cropped-puffer-jacket" }),
 ];

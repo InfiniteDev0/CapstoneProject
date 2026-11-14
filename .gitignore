@@ -26,3 +26,8 @@ Thumbs.db
 # Uploaded product photos (the admin adds these; they are not part of the code)
 apps/api/uploads/
 uploads/
+
+# Hero and tile photos used only for the local demo (not ours to publish)
+apps/api/src/main/resources/static/images/hero.*
+apps/api/src/main/resources/static/images/tile-*
+apps/api/src/main/resources/static/images/feature.*

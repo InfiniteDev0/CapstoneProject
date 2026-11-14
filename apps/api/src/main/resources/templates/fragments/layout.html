@@ -22,6 +22,11 @@
 <!--/* Toast host + the message a redirect left behind (flash) + the loading bar */-->
 <th:block th:fragment="feedback">
   <div id="loadbar" aria-hidden="true"></div>
+  <!--/* the page-loading animation, Barista style (shown by app.js while the next page loads) */-->
+  <div id="pageloader" role="status" aria-live="polite">
+    <span class="loader-dots" aria-hidden="true"><span></span><span></span><span></span></span>
+    <span class="sr-only">Loading</span>
+  </div>
   <div id="toasts" role="status" aria-live="polite"></div>
   <template id="flash" th:if="${toast}" th:attr="data-type=${toastType} ?: 'success',data-message=${toast}"></template>
   <script th:src="@{/js/toast.js}"></script>
