@@ -58,6 +58,7 @@ public class Fmt {
         if (minutes < 60) return minutes + " min ago";
         if (minutes < 60 * 24) return (minutes / 60) + " h ago";
         long days = minutes / (60 * 24);
+        if (days == 1) return "yesterday";
         return days < 30 ? days + " days ago" : date(when);
     }
 

@@ -93,8 +93,8 @@ CapstoneProject/
 - [x] Phase 3 — The kitchen (done 2026-11-12)
 - [x] Phase 4 — The wiring (done 2026-11-12)
 - [x] Rebrand to LuxuryShop + pages moved to Thymeleaf (done 2026-11-14)
-- [ ] Phase 5 — Practice guests  ← **we are here**
-- [ ] Phase 6 — The smart waiter
+- [x] Phase 5 — Practice guests (done 2026-11-14)
+- [ ] Phase 6 — The smart waiter  ← **we are here**
 - [ ] Phase 7 — Waiter meets kitchen
 - [ ] Phase 8 — Opening night
 
@@ -123,7 +123,8 @@ Update this checklist at the end of each phase.
 - **Phase 7 slots:** the home page has a comment where "Recommended For You" goes (a Swiper row like Related Products); `/admin/churn` and `/admin/models` show "Activates in Phase 7"; the dashboard churn card and the customer churn column show placeholders. REST placeholders: `GET /api/admin/churn`, `/retention-offers`, `/model-metrics` return `[]`. Checkout can already redeem a `retention_offers` code.
 - **Testing tip:** to test without touching Yussuf's server on 8080, run the jar from `apps/api` with `--spring.profiles.active=dev --server.port=8090`. Drive pages with headless Edge over CDP (scripts in the scratchpad). `WebPagesTests` and `ApiFlowTests` clean up after themselves.
 - **Footer links and newsletter** are placeholders (`href="#"`, newsletter shows a "coming soon" toast).
-- **Python is not installed yet** (only the Microsoft Store alias). Install Python 3.12 before Phase 6.
+- **Python:** 3.14 is installed (`py -3.14`); the project's own environment is `ml/.venv` (git-ignored), packages in `ml/requirements.txt`. Create it with `pnpm ml:setup`. Run Python as `ml\.venv\Scripts\python`.
+- **Practice data (Phase 5):** `pnpm data:generate` (wipe + regenerate) and `pnpm data:wipe`. Code in `ml/data_generation/` (config, db, catalog, personas, people, simulate, writer, generate). Seed 42; 500 customers (ids 1001+, `@example.com/.org/.net`, password `GEN_CUSTOMER_PASSWORD` in `.env`), ~2,650 orders, ~61k clicks, wishlists, open bags, reviews that follow taste. Personas are ONLY in `ml/data/generated/personas.csv` (git-ignored), never in the database. Churn rule in `docs/churn-definition.md`: cut-off = today − 60 days, label = no paid purchase in the 60 days after; features only from before the cut-off. The wipe never touches products, ids 1–3, the admin or real sign-ups.
 - **Databases:** see `database/README.md` (install, create, seed, reset, demo logins) and `docs/diagrams/er-diagram.md`.
   - MySQL 9.3 runs as service `MySQL93` on port 3306. `mysql.exe` is **not on PATH**: it's at `C:\Program Files\MySQL\MySQL Server 9.3\bin`. The app connects as `luxury_app` to `luxuryshop` (password in `.env`), never as root. `database\mysql\reset.ps1` rebuilds the tables and seed.
   - MongoDB 8.3 runs as service `MongoDB` on 27017, database `luxuryshop`. mongosh is at `%LOCALAPPDATA%\Programs\mongosh\mongosh.exe`. In PowerShell, run mongosh with `--file script.js`, not `--eval`.

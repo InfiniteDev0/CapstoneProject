@@ -141,6 +141,16 @@
     line.querySelector("[data-remove]")?.addEventListener("click", (e) => change("DELETE", undefined, e.currentTarget));
   });
 
+  // ---- checkout card form: "4242 4242 4242 4242" and "MM/YY" as you type ----------------
+  document.querySelector("[data-card-number]")?.addEventListener("input", (e) => {
+    const digits = e.target.value.replace(/\D/g, "").slice(0, 19);
+    e.target.value = digits.replace(/(.{4})/g, "$1 ").trim();
+  });
+  document.querySelector("[data-card-expiry]")?.addEventListener("input", (e) => {
+    const digits = e.target.value.replace(/\D/g, "").slice(0, 4);
+    e.target.value = digits.length > 2 ? `${digits.slice(0, 2)}/${digits.slice(2)}` : digits;
+  });
+
   // ---- newsletter (a front-end placeholder for now) --------------------------------------
   document.querySelector("[data-newsletter]")?.addEventListener("submit", (e) => {
     e.preventDefault();

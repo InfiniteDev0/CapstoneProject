@@ -31,3 +31,6 @@ uploads/
 apps/api/src/main/resources/static/images/hero.*
 apps/api/src/main/resources/static/images/tile-*
 apps/api/src/main/resources/static/images/feature.*
+
+# Generated practice data (personas, summaries); regenerate with pnpm data:generate
+ml/data/

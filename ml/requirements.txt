@@ -1,0 +1,11 @@
+# Python packages for the ml/ folder (Phase 5 data generator; Phase 6 adds the AI ones).
+# Install into the project's own virtual environment:
+#   py -3.14 -m venv ml\.venv
+#   ml\.venv\Scripts\python -m pip install -r ml\requirements.txt
+faker>=37.0
+numpy>=2.3
+pandas>=2.3
+pymysql>=1.1
+pymongo>=4.13
+bcrypt>=4.3
+python-dotenv>=1.1

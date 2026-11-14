@@ -7,7 +7,10 @@
     "dev:api": "cd apps/api && .\\mvnw.cmd spring-boot:run -Dspring-boot.run.profiles=dev",
     "css:build": "tailwindcss -i apps/api/styles/app.css -o apps/api/src/main/resources/static/css/app.css --minify",
     "css:watch": "tailwindcss -i apps/api/styles/app.css -o apps/api/src/main/resources/static/css/app.css --watch",
-    "test:api": "cd apps/api && .\\mvnw.cmd test"
+    "test:api": "cd apps/api && .\\mvnw.cmd test",
+    "ml:setup": "py -3.14 -m venv ml\\.venv && ml\\.venv\\Scripts\\python -m pip install -r ml\\requirements.txt",
+    "data:generate": "cd ml && .venv\\Scripts\\python -m data_generation.generate",
+    "data:wipe": "cd ml && .venv\\Scripts\\python -m data_generation.generate --wipe-only"
   },
   "devDependencies": {
     "@fontsource-variable/outfit": "^5.3.0",

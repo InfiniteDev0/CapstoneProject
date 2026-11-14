@@ -49,8 +49,8 @@ public class DashboardService {
                 .toList();
 
         // The last 6 months, oldest first (for the sales chart in Phase 7)
-        Instant sixMonthsAgo = LocalDate.now(ZoneOffset.UTC).withDayOfMonth(1).minusMonths(5).atStartOfDay().toInstant(ZoneOffset.UTC);
-        List<DashboardStats.MonthlySales> months = orders.salesByMonth(sixMonthsAgo).stream()
+        Instant yearAgo = LocalDate.now(ZoneOffset.UTC).withDayOfMonth(1).minusMonths(11).atStartOfDay().toInstant(ZoneOffset.UTC);
+        List<DashboardStats.MonthlySales> months = orders.salesByMonth(yearAgo).stream()
                 .map(r -> new DashboardStats.MonthlySales((String) r[0], Pricing.money(new BigDecimal(r[1].toString())),
                         ((Number) r[2]).longValue()))
                 .toList();

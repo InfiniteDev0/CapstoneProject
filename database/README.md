@@ -113,6 +113,24 @@ db.products.find(
 
 The `product_id` and `sku` in MySQL match the `_id` and `variants.sku` in MongoDB. There is no foreign key across the two databases; the Java backend checks these links.
 
+## 7. Practice data (Phase 5)
+
+A year of believable shop history, so the dashboard looks like a real business and the AI has something to learn from:
+500 customers, about 2,650 orders ($1.37M), 61,000 clicks, wishlists, open bags and reviews. It is made by a Python script
+([`ml/data_generation/`](../ml/data_generation/)) with a fixed random seed, so it comes out the same every time.
+
+```powershell
+pnpm ml:setup        # once: creates ml\.venv and installs the Python packages (needs Python 3.12+)
+pnpm data:generate   # wipe the old practice data, then generate a fresh year
+pnpm data:wipe       # only remove the practice data
+```
+
+- **What it never touches:** the products, the admin, the 3 test users, real sign-ups and their orders. A row is "practice" only when its user id is 1001 or more **and** its email ends in `@example.com/.org/.net`; practice clicks have a `gen-` session id.
+- **Practice customers' password:** one shared password, set as `GEN_CUSTOMER_PASSWORD` in the root `.env` (never committed). Emails look like `wanjiru.kamau@example.com`.
+- **Hidden personas** (loyal, big spender, bargain hunter, casual, fader; taste groups such as runners or outerwear lovers) are saved only to `ml/data/generated/personas.csv` for checking. They are **not** in the database: the AI has to discover them.
+- **Churn:** the definition (60-day window after a cut-off, no data leakage) is in [`docs/churn-definition.md`](../docs/churn-definition.md).
+- Stock levels are not changed: they are today's shelf, after the year's restocks.
+
 ## The catalogue
 
 | Category | Subcategories | Products |
@@ -130,7 +148,7 @@ The `product_id` and `sku` in MySQL match the `_id` and `variants.sku` in MongoD
 
 | | Count |
 |---|---|
-| MySQL users | 3 (1 admin, 2 customers) |
+| MySQL users | 3 (1 admin, 2 customers), plus 500 practice customers after `pnpm data:generate` |
 | MySQL orders | none (orders come from real checkouts; Phase 5 adds practice orders) |
 | MongoDB products | 72 |
 | MongoDB categories | 3 (with their subcategories) |
